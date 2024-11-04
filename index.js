@@ -7,19 +7,18 @@ function generatePalette() {
   document.querySelector(':root').style.setProperty('--color1', `hsl(${hue}, ${saturation}%, 64%)`)
   document.querySelector(':root').style.setProperty('--color2', `hsl(${hue}, ${saturation}%, 24%)`)
   document.querySelector(':root').style.setProperty('--color3', `hsl(${hue}, ${saturation}%, 94%)`)
-}
+};
 
-
+generatePalette();
 
 function generateBoard() {
   document.querySelector('.container').remove();
-  generatePalette();
   const container = document.createElement('div')
   container.setAttribute('class', 'container');
   container.style.opacity = "0";
   setTimeout(() => {
     document.querySelector('.container').style.opacity = 1;
-  }, 500)
+  }, 10)
   document.body.append(container);
   let i = 1;
   for (let a = 1; a <= 3; a++) {
@@ -51,16 +50,19 @@ function generateBoard() {
       i++;
     }
   }
-}
+};
 
 let board = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 
 
 const user = {
+  name: '',
+
   moves: [],
 
   result: [],
+
 
   showMove: (i) => {
     document.querySelector(`.cross-${i}`).style.display = 'flex'
@@ -72,6 +74,7 @@ const user = {
 
   makeMove: (i) => {
     generalCount++;
+
     if (checkForVictory(computer) !== "victory") {
 
       document.querySelector(`.cross-${i}`).style.display = 'flex';
@@ -125,12 +128,12 @@ const user = {
     document.querySelector(`.square1-${user.result[2]}`).style.opacity = 1;
   }
 
-}
+};
 
 const computer = {
   moves: [],
   result: [],
-  moveCount: 1,
+
 
   showMove: (squareNumber) => {
     const show = document.querySelector(`.square2-${squareNumber}`);
@@ -148,7 +151,6 @@ const computer = {
 
   generateMove: () => {
     if (generalCount === 1) {
-      console.log('one');
       randomMove1 = Math.floor(Math.random() * 4);
       if (randomMove1 === 0) {
         computer.play(1);
@@ -235,11 +237,9 @@ const computer = {
 
     }
 
-
     if (checkForVictory(computer) === "victory") {
       computer.celebrate();
-    }
-
+    } checkForDraw();
   },
 
   celebrate: () => {
@@ -257,14 +257,14 @@ const computer = {
     document.querySelector(`.square2-${computer.result[0]}`).style.boxShadow = 'none';
     document.querySelector(`.square2-${computer.result[0]}`).style.opacity = 1;
 
-    document.querySelector(`.square2-${computer.result[0]}`).style.transition = 'background-color 1s';
+    document.querySelector(`.square2-${computer.result[1]}`).style.transition = 'background-color 1s';
     document.querySelector(`.square2-${computer.result[1]}`).style.backgroundColor = 'var(--color2)';
     document.querySelector(`.circle-${computer.result[1]}`).style.color = 'var(--color3)';
     document.querySelector(`.circle-${computer.result[1]}`).innerText = 'o';
     document.querySelector(`.square2-${computer.result[1]}`).style.boxShadow = 'none';
     document.querySelector(`.square2-${computer.result[1]}`).style.opacity = 1;
 
-    document.querySelector(`.square2-${computer.result[0]}`).style.transition = 'background-color 1s';
+    document.querySelector(`.square2-${computer.result[2]}`).style.transition = 'background-color 1s';
     document.querySelector(`.square2-${computer.result[2]}`).style.backgroundColor = 'var(--color2)';
     document.querySelector(`.circle-${computer.result[2]}`).style.color = 'var(--color3)';
     document.querySelector(`.circle-${computer.result[2]}`).innerText = 'z';
@@ -293,16 +293,16 @@ const computer = {
       })
 
       document.querySelector(`.circle-${1}`).innerText = 't';
-      document.querySelector(`.circle-${2}`).innerText = '';
-      document.querySelector(`.circle-${3}`).innerText = 'a';
-      document.querySelector(`.circle-${4}`).innerText = 'r';
+      document.querySelector(`.circle-${2}`).innerText = 'r';
+      document.querySelector(`.circle-${3}`).innerText = 'y';
+      document.querySelector(`.circle-${4}`).innerText = '';
       document.querySelector(`.circle-${5}`).innerText = 'a';
-      document.querySelector(`.circle-${6}`).innerText = 'i';
-      document.querySelector(`.circle-${7}`).innerText = 'y';
-      document.querySelector(`.circle-${8}`).innerText = 'g';
+      document.querySelector(`.circle-${6}`).innerText = 'g';
+      document.querySelector(`.circle-${7}`).innerText = 'a';
+      document.querySelector(`.circle-${8}`).innerText = 'i';
       document.querySelector(`.circle-${9}`).innerText = 'n';
 
-
+      document.querySelector('.scoreboard').style.opacity = 0;
       for (let i = 1; i < 10; i++) {
         let newTimer;
         newTimer = setTimeout(() => {
@@ -329,6 +329,23 @@ const computer = {
   }
 };
 
+let userWins = 20;
+let computerWins = 20;
+
+if (localStorage.getItem('username') === null) {
+  generateInitialDialog()
+} else {
+  user.name = localStorage.getItem('username');
+  computer.name = localStorage.getItem('computername')
+  generateBoard();
+  setTimeout(() => {
+    document.querySelector('.username').innerText = `${user.name}`
+    document.querySelector('.machinename').innerText = `${computer.name}`
+
+  }, 100);
+  computer.generateMove();
+}
+
 function checkFormula(player, a, b, c) {
   if (player.moves.includes(a) &&
     player.moves.includes(b) &&
@@ -336,7 +353,7 @@ function checkFormula(player, a, b, c) {
     player.result = [a, b, c];
     return "victory";
   }
-}
+};
 
 function checkForVictory(player) {
 
@@ -350,7 +367,230 @@ function checkForVictory(player) {
     checkFormula(player, 7, 8, 9) === "victory") {
     return "victory"
   }
-}
+};
 
-generateBoard();
-computer.generateMove();
+
+function generateScoreBoard() {
+  const scoreboard = document.createElement('div');
+  scoreboard.setAttribute('class', 'scoreboard');
+  scoreboard.setAttribute('onclick', 'generatePalette()');
+  scoreboard.style.opacity = 0;
+  const user = document.createElement('div');
+  user.setAttribute('class', 'user');
+  const username = document.createElement('h1');
+  username.setAttribute('class', 'username')
+  username.innerText = "Player One";
+  user.appendChild(username);
+  const score = document.createElement('div');
+  score.setAttribute('class', 'result');
+  const userScore = document.createElement('div');
+  userScore.setAttribute('class', 'userScoreDiv')
+  score.appendChild(userScore);
+
+  const userScoreText = document.createElement('h2');
+  userScoreText.setAttribute('class', 'userScoreText')
+  userScoreText.innerText = `${userWins}`;
+  score.appendChild(userScoreText);
+
+  const machineScore = document.createElement('div');
+  machineScore.setAttribute('class', 'machineScoreDiv')
+  score.appendChild(machineScore);
+
+  const machineScoreText = document.createElement('h2');
+  machineScoreText.setAttribute('class', 'machineScoreText')
+  machineScoreText.innerText = `${computerWins}`;
+  score.appendChild(machineScoreText);
+
+  const machine = document.createElement('div');
+  machine.setAttribute('class', 'machine');
+  scoreboard.appendChild(user);
+  scoreboard.appendChild(score);
+  scoreboard.appendChild(machine);
+  const machinename = document.createElement('h1');
+  machinename.innerText = 'Computer';
+  machinename.setAttribute('class', 'machinename')
+  machine.appendChild(machinename);
+  document.body.appendChild(scoreboard);
+  setTimeout(() => {
+    document.querySelector('.scoreboard').style.opacity = 1;
+  }, 1)
+};
+
+generateScoreBoard();
+
+function generateInitialDialog() {
+  const dialog = document.createElement('dialog');
+  dialog.setAttribute('class', 'dialog');
+  dialog.setAttribute('open', 'no');
+  dialog.style.opacity = 0;
+
+  const input = document.createElement('input');
+  input.setAttribute('class', 'input');
+  input.setAttribute('placeholder', 'Set a name for player one ');
+  dialog.appendChild(input);
+
+  const submitButton = document.createElement('button');
+  submitButton.setAttribute('class', 'submit-button');
+  submitButton.innerText = 'Submit';
+  submitButton.setAttribute('onclick', 'submitUserName()')
+  dialog.appendChild(submitButton);
+
+
+  document.body.appendChild(dialog);
+  setTimeout(() => {
+    document.querySelector('.dialog').setAttribute('open', 'yes');
+    document.querySelector('.dialog').style.opacity = 1;
+    document.querySelector('.input').focus();
+  }, 10)
+};
+
+
+
+function submitUserName() {
+  if (!document.querySelector('.input').value) {
+    user.name = 'Player One'
+    document.querySelector('.username').innerText = `${user.name}`;
+  } else {
+    user.name = document.querySelector('.input').value.toString();
+    document.querySelector('.username').innerText = `${user.name}`;
+    localStorage.setItem('username', user.name);
+  }
+  document.querySelector('.submit-button').setAttribute('onclick', 'submitComputerName()');
+  document.querySelector('.input').value = '';
+  document.querySelector('.input').setAttribute('placeholder', 'Set a name for the computer');
+  document.querySelector('.username').classList.add('animate');
+  document.querySelector('.scoreboard').classList.add('flashScoreboard');
+  setTimeout(() => {
+    document.querySelector('.username').classList.remove('animate');
+    document.querySelector('.scoreboard').classList.remove('flashScoreboard');
+
+  }, 700)
+
+};
+
+function submitComputerName() {
+  if (!document.querySelector('.input').value) {
+    computer.name = 'Computer'
+    document.querySelector('.machinename').innerText = `${computer.name}`;
+  } else {
+    computer.name = document.querySelector('.input').value.toString();
+    document.querySelector('.machinename').innerText = `${computer.name}`;
+    localStorage.setItem('computername', computer.name);
+  }
+  document.querySelector('.machinename').classList.add('animate');
+  document.querySelector('.dialog').remove();
+
+  document.querySelector('.scoreboard').classList.add('flashScoreboard');
+  setTimeout(() => {
+    document.querySelector('.username').classList.remove('animate');
+    document.querySelector('.scoreboard').classList.remove('flashScoreboard')
+  }, 700)
+
+  generateBoard();
+  computer.generateMove();
+};
+
+function checkForDraw() {
+  if (board.length === 0) {
+    setTimeout(() => {endInDraw();
+    }, 300)}
+};
+
+function endInDraw() {
+  if (user.moves.length = 4) {
+    document.querySelectorAll('.square1').forEach((element) => {
+      element.style.opacity = 0;
+      element.style.border = 'none';
+    })
+    document.querySelectorAll('.square2').forEach((element) => {
+      element.style.opacity = 0;
+    })
+
+    user.moves.sort();
+
+    document.querySelector(`.square1-${user.moves[0]}`).style.transition = 'background-color 1s';
+    document.querySelector(`.square1-${user.moves[0]}`).style.backgroundColor = 'var(--color2)';
+    document.querySelector(`.cross-${user.moves[0]}`).style.color = 'var(--color3)';
+    document.querySelector(`.cross-${user.moves[0]}`).innerText = 'd';
+    document.querySelector(`.square1-${user.moves[0]}`).style.boxShadow = 'none';
+    document.querySelector(`.square1-${user.moves[0]}`).style.opacity = 1;
+
+    document.querySelector(`.square1-${user.moves[1]}`).style.transition = 'background-color 1s';
+    document.querySelector(`.square1-${user.moves[1]}`).style.backgroundColor = 'var(--color2)';
+    document.querySelector(`.cross-${user.moves[1]}`).style.color = 'var(--color3)';
+    document.querySelector(`.cross-${user.moves[1]}`).innerText = 'r';
+    document.querySelector(`.square1-${user.moves[1]}`).style.boxShadow = 'none';
+    document.querySelector(`.square1-${user.moves[1]}`).style.opacity = 1;
+
+    document.querySelector(`.square1-${user.moves[2]}`).style.transition = 'background-color 1s';
+    document.querySelector(`.square1-${user.moves[2]}`).style.backgroundColor = 'var(--color2)';
+    document.querySelector(`.cross-${user.moves[2]}`).style.color = 'var(--color3)';
+    document.querySelector(`.cross-${user.moves[2]}`).innerText = 'a';
+    document.querySelector(`.square1-${user.moves[2]}`).style.boxShadow = 'none';
+    document.querySelector(`.square1-${user.moves[2]}`).style.opacity = 1;
+
+    document.querySelector(`.square1-${user.moves[3]}`).style.transition = 'background-color 1s';
+    document.querySelector(`.square1-${user.moves[3]}`).style.backgroundColor = 'var(--color2)';
+    document.querySelector(`.cross-${user.moves[3]}`).style.color = 'var(--color3)';
+    document.querySelector(`.cross-${user.moves[3]}`).innerText = 'w';
+    document.querySelector(`.square1-${user.moves[3]}`).style.boxShadow = 'none';
+    document.querySelector(`.square1-${user.moves[3]}`).style.opacity = 1;
+
+    let timer1;
+    timer1 = setTimeout(() => {
+      document.querySelectorAll('.square1').forEach((element) => {
+        element.style.display = 'none';
+      })
+
+      document.querySelectorAll('.square2').forEach((element) => {
+        element.style.opacity = 1;
+        document.querySelectorAll('.square2').forEach((element) => {
+          element.style.display = 'flex';
+        })
+      })
+    }, 1500)
+
+    let timer2;
+    timer2 = setTimeout(() => {
+      document.querySelectorAll('.circle').forEach((element) => {
+        element.style.opacity = 1;
+        element.style.color = 'var(--color3)'
+      })
+
+      document.querySelector(`.circle-${1}`).innerText = 't';
+      document.querySelector(`.circle-${2}`).innerText = 'r';
+      document.querySelector(`.circle-${3}`).innerText = 'y';
+      document.querySelector(`.circle-${4}`).innerText = '';
+      document.querySelector(`.circle-${5}`).innerText = 'a';
+      document.querySelector(`.circle-${6}`).innerText = 'g';
+      document.querySelector(`.circle-${7}`).innerText = 'a';
+      document.querySelector(`.circle-${8}`).innerText = 'i';
+      document.querySelector(`.circle-${9}`).innerText = 'n';
+
+      document.querySelector('.scoreboard').style.opacity = 0;
+      for (let i = 1; i < 10; i++) {
+        let newTimer;
+        newTimer = setTimeout(() => {
+          document.querySelector(`.square2-${i}`).style.backgroundColor = 'var(--color1)';
+          document.querySelector(`.square2-${i}`).style.boxShadow = 'none';
+          document.querySelector(`.square2-${i}`).style.border = 'none';
+          document.querySelector(`.square2-${i}`).style.opacity = 1;
+          document.querySelector(`.circle-${i}`).style.opacity = 1
+          document.querySelector(`.circle-${i}`).style.color = 'var(--color2)'
+
+          let newTimer2;
+          newTimer2 = setTimeout(() => {
+            document.querySelector('.container').style.opacity = 0;
+
+
+          }, 1000)
+        })
+      }
+    }, 1500)
+    let newTimer3;
+    newTimer3 = setTimeout(() => {
+      location.reload();
+    }, 3500)
+  
+  }
+}
