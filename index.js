@@ -19,8 +19,8 @@ document.querySelector('.coin-tails').addEventListener('click', () => {
 if (localStorage.getItem('hasgamestarted' === null)) {
   hasGameStarted = 'no';
 } else {
-  hasGameStarted = 'yes';
-  setTimeout(() => {localStorage.setItem('hasgamestarted', hasGameStarted)}, 10000)
+  setTimeout(() => {  hasGameStarted = 'yes';
+    localStorage.setItem('hasgamestarted', hasGameStarted)}, 10000)
 }
 
 function generateBoard() {
@@ -248,7 +248,6 @@ const computer = {
     computer.showMove(number);
     computer.moves.push(number);
     generalCount++;
-    console.log(generalCount)
   },
 
   generateMove: () => {
@@ -996,7 +995,9 @@ if (hasGameStarted === 'yes') {
         document.querySelector('.machinename').style.display = 'initial';
       }
     })
-  })
+  });
+
+
 
 }
 
