@@ -4,22 +4,44 @@ let generalCount = 1;
 function generatePalette() {
   hue = Math.floor(Math.random() * 359);
   saturation = Math.floor(Math.random() * 75);
-  document.querySelector(':root').style.setProperty('--color1', `hsl(${hue}, ${saturation}%, 64%)`)
-  document.querySelector(':root').style.setProperty('--color2', `hsl(${hue}, ${saturation}%, 24%)`)
-  document.querySelector(':root').style.setProperty('--color3', `hsl(${hue}, ${saturation}%, 94%)`)
+  document.querySelector(':root').style.setProperty('--color1', `hsl(${hue}, ${saturation}%, 64%)`);
+  document.querySelector(':root').style.setProperty('--color2', `hsl(${hue}, ${saturation}%, 24%)`);
+  document.querySelector(':root').style.setProperty('--color3', `hsl(${hue}, ${saturation}%, 94%)`);
 };
 
-generatePalette();
+document.querySelector('.coin-heads').addEventListener('click', () => {
+  flipHeads();
+})
+document.querySelector('.coin-tails').addEventListener('click', () => {
+  flipTails();
+})
+
+let isFirstTime;
+
+let userName;
+let computerName;
 
 function generateBoard() {
-  document.querySelector('.container').remove();
+  if (localStorage.getItem('isfirsttime') !== 'no') {
+    isFirstTime = 'no';
+    localStorage.setItem('isfirsttime', isFirstTime)
+  } else {
+    generatePalette();
+  }
+  document.querySelector('.coin-heads').removeEventListener('click', flipHeads);
+  document.querySelector('.coin-tails').removeEventListener('click', flipTails);
+  document.querySelector('.btns-container').remove();
+  document.querySelector('.envelope').remove();
+  document.querySelector('body').style.opacity = 0;
+  timer = setTimeout(() => { document.querySelector('body').style.opacity = 1 }, 100);
+
+  generateScoreBoard();
+  // document.querySelector('.container').remove();
   const container = document.createElement('div')
   container.setAttribute('class', 'container');
   container.style.opacity = "0";
-  setTimeout(() => {
-    document.querySelector('.container').style.opacity = 1;
-  }, 10)
   document.body.append(container);
+  document.querySelector('.container').style.opacity = 1;
   let i = 1;
   for (let a = 1; a <= 3; a++) {
     const row = document.createElement('div');
@@ -46,7 +68,13 @@ function generateBoard() {
       square2.appendChild(circle);
       row.appendChild(square1);
       row.appendChild(square2);
+      row.style.opacity = 0;
       document.querySelector('.container').appendChild(row);
+      setTimeout(() => {
+        document.querySelectorAll('.row').forEach((element) => {
+          element.style.opacity = 1;
+        }, 100)
+      })
       i++;
     }
   }
@@ -90,9 +118,9 @@ const user = {
         document.querySelectorAll('.square1').forEach((square) => {
           square.removeAttribute('onclick');
           square.removeAttribute('onmouseover');
-          user.celebrate()
 
         })
+        user.celebrate()
       } else {
         computer.generateMove();
       }
@@ -100,6 +128,8 @@ const user = {
   },
 
   celebrate: () => {
+    userScoreUpdate();
+
     document.querySelectorAll('.square1').forEach((element) => {
       element.style.opacity = 0;
     })
@@ -126,8 +156,68 @@ const user = {
     document.querySelector(`.cross-${user.result[2]}`).innerText = 'n';
     document.querySelector(`.square1-${user.result[2]}`).style.boxShadow = 'none';
     document.querySelector(`.square1-${user.result[2]}`).style.opacity = 1;
-  }
+    document.querySelectorAll('.square1').forEach((element) => {
+      element.style.transition = '700ms';
+    })
 
+    setTimeout(() => {
+      document.querySelectorAll('.square2').forEach((element) => {
+        element.style.display = 'none';
+
+
+        document.querySelectorAll('.square1').forEach((element) => {
+          element.style.transition = "opacity 1s"
+          element.style.opacity = 1;
+          element.style.display = 'flex';
+          element.style.backgroundColor = 'var(--color1)'
+          document.querySelectorAll('.cross').forEach((element) => {
+            element.style.display = 'flex';
+            element.style.opacity = 1;
+            element.style.color = 'var(--color3)'
+
+            document.querySelector(`.cross-${1}`).innerText = 't';
+            document.querySelector(`.cross-${2}`).innerText = 'o';
+            document.querySelector(`.cross-${3}`).innerText = 'p';
+            document.querySelector(`.cross-${4}`).innerText = '-';
+            document.querySelector(`.cross-${5}`).innerText = 'n';
+            document.querySelector(`.cross-${6}`).innerText = 'o';
+            document.querySelector(`.cross-${7}`).innerText = 't';
+            document.querySelector(`.cross-${8}`).innerText = 'c';
+            document.querySelector(`.cross-${9}`).innerText = 'h';
+          })
+        })
+      }, 150)
+
+
+
+
+
+      document.querySelector('.scoreboard').style.opacity = 0;
+      for (let i = 1; i < 10; i++) {
+        let newTimer;
+        newTimer = setTimeout(() => {
+          document.querySelector(`.square1-${i}`).style.backgroundColor = 'var(--color1)';
+          document.querySelector(`.square1-${i}`).style.boxShadow = 'none';
+          document.querySelector(`.square1-${i}`).style.border = 'none';
+          document.querySelector(`.square1-${i}`).style.opacity = 1;
+          document.querySelector(`.cross-${i}`).style.opacity = 1
+          document.querySelector(`.cross-${i}`).style.color = 'var(--color2)'
+
+          let newTimer2;
+          newTimer2 = setTimeout(() => {
+            document.querySelector('.container').style.opacity = 0;
+
+
+          }, 1000)
+        }, 10)
+      }
+    }, 1500)
+    let newTimer3;
+    newTimer3 = setTimeout(() => {
+      location.reload();
+    }, 3500)
+
+  }
 };
 
 const computer = {
@@ -150,201 +240,271 @@ const computer = {
   },
 
   generateMove: () => {
-    if (generalCount === 1) {
-      randomMove1 = Math.floor(Math.random() * 4);
-      if (randomMove1 === 0) {
-        computer.play(1);
-      } else if (randomMove1 === 1) {
-        computer.play(3)
-      } else if (randomMove1 === 2) {
-        computer.play(7)
-      } else if (randomMove1 === 3) {
-        computer.play(9)
-      }
-    } else if (generalCount === 3) {
-      if (board.includes(1) && !computer.moves.includes(1)) {
-        computer.play(1);
-      } else if (board.includes(3) && !computer.moves.includes(3)) {
-        computer.play(3);
-      } else if (board.includes(7) && !computer.moves.includes(7)) {
-        computer.play(7);
-      } else if (board.includes(9) && !computer.moves.includes(9)) {
-        computer.play(9);
-      }
-    } else if (generalCount === 5 || generalCount === 7 || generalCount === 9) {
-      if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(2)) {
-        computer.play(2);
-      } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(4)) {
-        computer.play(4);
-      } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(5)) {
-        computer.play(5);
-      } else if (computer.moves.includes(3) && computer.moves.includes(9) && board.includes(6)) {
-        computer.play(6);
-      } else if (computer.moves.includes(3) && computer.moves.includes(7) && board.includes(5)) {
-        computer.play(5);
-      } else if (computer.moves.includes(7) && computer.moves.includes(9) && board.includes(8)) {
-        computer.play(8);
-      } else if (user.moves.includes(1) && user.moves.includes(2) && board.includes(3)) {
-        computer.play(3);
-      } else if (user.moves.includes(1) && user.moves.includes(4) && board.includes(7)) {
-        computer.play(7);
-      } else if (user.moves.includes(2) && user.moves.includes(3) && board.includes(1)) {
-        computer.play(1);
-      } else if (user.moves.includes(2) && user.moves.includes(5) && board.includes(8)) {
-        computer.play(8);
-      } else if (user.moves.includes(2) && user.moves.includes(8) && board.includes(5)) {
-        computer.play(5);
-      } else if (user.moves.includes(3) && user.moves.includes(5) && board.includes(7)) {
-        computer.play(7);
-      } else if (user.moves.includes(3) && user.moves.includes(6) && board.includes(9)) {
-        computer.play(9);
-      } else if (user.moves.includes(4) && user.moves.includes(5) && board.includes(6)) {
-        computer.play(6);
-      } else if (user.moves.includes(4) && user.moves.includes(7) && board.includes(1)) {
-        computer.play(1);
-      } else if (user.moves.includes(5) && user.moves.includes(6) && board.includes(4)) {
-        computer.play(4);
-      } else if (user.moves.includes(5) && user.moves.includes(8) && board.includes(2)) {
-        computer.play(2);
-      } else if (user.moves.includes(7) && user.moves.includes(8) && board.includes(9)) {
-        computer.play(9);
-      } else if (user.moves.includes(8) && user.moves.includes(9) && board.includes(7)) {
-        computer.play(7);
-      } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(7)) {
-        computer.play(7);
-      } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(9)) {
-        computer.play(9);
-      } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(9)) {
-        computer.play(9);
-      } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(3)) {
-        computer.play(3);
-      } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(7)) {
-        computer.play(7);
-      } else if (computer.moves.includes(3) && computer.moves.includes(7) && board.includes(9)) {
-        computer.play(9);
-      } else if (computer.moves.includes(3) && computer.moves.includes(9) && board.includes(7)) {
-        computer.play(7);
-      } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(3)) {
-        computer.play(3);
-      } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(3)) {
-        computer.play(3);
-      } else {
-        let randomMove = Math.floor(Math.random() * board.length)
-        computer.play(board.indexOf(randomMove));
-      }
+    if (checkForVictory(user) !== "victory") {
+      setTimeout(() => {
+        if (generalCount === 1) {
+          randomMove1 = Math.floor(Math.random() * 4);
+          if (randomMove1 === 0) {
+            computer.play(1);
+          } else if (randomMove1 === 1) {
+            computer.play(3)
+          } else if (randomMove1 === 2) {
+            computer.play(7)
+          } else if (randomMove1 === 3) {
+            computer.play(9)
+          }
+        } else if (generalCount === 3) {
+          if (board.includes(1) && !computer.moves.includes(1)) {
+            computer.play(1);
+          } else if (board.includes(3) && !computer.moves.includes(3)) {
+            computer.play(3);
+          } else if (board.includes(7) && !computer.moves.includes(7)) {
+            computer.play(7);
+          } else if (board.includes(9) && !computer.moves.includes(9)) {
+            computer.play(9);
+          }
+        } else if (generalCount === 5 || generalCount === 7 || generalCount === 9) {
+
+          if (computer.moves.includes(1) && computer.moves.includes(2) && board.includes(3)) {
+            computer.play(3);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(2)) {
+            //   computer.play(2);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(4) && board.includes(7)) {
+            //   computer.play(7);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(5) && board.includes(9)) {
+            //   computer.play(9);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(4)) {
+            //   computer.play(4);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(5)) {
+            //   computer.play(5);
+
+            // } else if (computer.moves.includes(3) && computer.moves.includes(1) && board.includes(2)) {
+            //   computer.play(2);
+            // } else if (computer.moves.includes(3) && computer.moves.includes(2) && board.includes(1)) {
+            //   computer.play(1);
+            // } else if (computer.moves.includes(3) && computer.moves.includes(5) && board.includes(7)) {
+            //   computer.play(7);
+            // } else if (computer.moves.includes(3) && computer.moves.includes(6) && board.includes(9)) {
+            //   computer.play(9);
+            // } else if (computer.moves.includes(3) && computer.moves.includes(7) && board.includes(5)) {
+            //   computer.play(5);
+            // } else if (computer.moves.includes(3) && computer.moves.includes(9) && board.includes(6)) {
+            //   computer.play(6);
+
+            // } else if (computer.moves.includes(7) && computer.moves.includes(9) && board.includes(8)) {
+            //   computer.play(8);
 
 
 
+            // } else if (user.moves.includes(1) && user.moves.includes(2) && board.includes(3)) {
+            //   computer.play(3);
+            // } else if (user.moves.includes(1) && user.moves.includes(3) && board.includes(2)) {
+            //   computer.play(2);
+            // } else if (user.moves.includes(1) && user.moves.includes(4) && board.includes(7)) {
+            //   computer.play(7);
+            // } else if (user.moves.includes(1) && user.moves.includes(7) && board.includes(4)) {
+            //   computer.play(4);
+            // } else if (user.moves.includes(1) && user.moves.includes(5) && board.includes(9)) {
+            //   computer.play(9);
+            // } else if (user.moves.includes(1) && user.moves.includes(9) && board.includes(5)) {
+            //   computer.play(5);
+
+
+            // } else if (user.moves.includes(2) && user.moves.includes(3) && board.includes(1)) {
+            //   computer.play(1);
+            // } else if (user.moves.includes(2) && user.moves.includes(5) && board.includes(8)) {
+            //   computer.play(8);
+            // } else if (user.moves.includes(2) && user.moves.includes(8) && board.includes(5)) {
+            //   computer.play(5);
+
+            // } else if (user.moves.includes(3) && user.moves.includes(5) && board.includes(7)) {
+            //   computer.play(7);
+            // } else if (user.moves.includes(3) && user.moves.includes(6) && board.includes(9)) {
+            //   computer.play(9);
+            // } else if (user.moves.includes(3) && user.moves.includes(7) && board.includes(5)) {
+            //   computer.play(5);
+            // } else if (user.moves.includes(3) && user.moves.includes(9) && board.includes(6)) {
+            //   computer.play(6);
+
+            // } else if (user.moves.includes(4) && user.moves.includes(5) && board.includes(6)) {
+            //   computer.play(6);
+            // } else if (user.moves.includes(4) && user.moves.includes(7) && board.includes(1)) {
+            //   computer.play(1);
+
+            // } else if (user.moves.includes(5) && user.moves.includes(6) && board.includes(4)) {
+            //   computer.play(4);
+            // } else if (user.moves.includes(5) && user.moves.includes(7) && board.includes(3)) {
+            //   computer.play(3);
+            // } else if (user.moves.includes(5) && user.moves.includes(8) && board.includes(2)) {
+            //   computer.play(2);
+
+            // } else if (user.moves.includes(6) && user.moves.includes(9) && board.includes(3)) {
+            //   computer.play(3);
+
+            // } else if (user.moves.includes(7) && user.moves.includes(8) && board.includes(9)) {
+            //   computer.play(9);
+            // } else if (user.moves.includes(7) && user.moves.includes(9) && board.includes(8)) {
+            //   computer.play(8);
+
+            // } else if (user.moves.includes(8) && user.moves.includes(9) && board.includes(7)) {
+            //   computer.play(7);
+
+            // } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(7)) {
+            //   computer.play(7);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(9)) {
+            //   computer.play(9);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(9)) {
+            //   computer.play(9);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(3)) {
+            //   computer.play(3);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(7)) {
+            //   computer.play(7);
+            // } else if (computer.moves.includes(3) && computer.moves.includes(7) && board.includes(9)) {
+            //   computer.play(9);
+            // } else if (computer.moves.includes(3) && computer.moves.includes(9) && board.includes(7)) {
+            //   computer.play(7);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(3)) {
+            //   computer.play(3);
+            // } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(3)) {
+            //   //   computer.play(3);
+          } else {
+            let randomMove = Math.floor(Math.random() * board.length)
+            computer.play(board[randomMove]);
+          }
+
+
+
+        }
+
+        if (checkForVictory(computer) === "victory") {
+          setTimeout(() => { computer.celebrate(); }, 200)
+        } else { checkForDraw();}
+      }, 150)
     }
-
-    if (checkForVictory(computer) === "victory") {
-      computer.celebrate();
-    } checkForDraw();
   },
 
   celebrate: () => {
-    checkForVictory(computer);
-    document.querySelectorAll('.square1').forEach((element) => {
-      element.style.opacity = 0;
-    })
-    document.querySelectorAll('.square2').forEach((element) => {
-      element.style.opacity = 0;
-    })
-    document.querySelector(`.square2-${computer.result[0]}`).style.transition = 'background-color 1s';
-    document.querySelector(`.square2-${computer.result[0]}`).style.backgroundColor = 'var(--color2)';
-    document.querySelector(`.circle-${computer.result[0]}`).style.color = 'var(--color3)';
-    document.querySelector(`.circle-${computer.result[0]}`).innerText = 's';
-    document.querySelector(`.square2-${computer.result[0]}`).style.boxShadow = 'none';
-    document.querySelector(`.square2-${computer.result[0]}`).style.opacity = 1;
 
-    document.querySelector(`.square2-${computer.result[1]}`).style.transition = 'background-color 1s';
-    document.querySelector(`.square2-${computer.result[1]}`).style.backgroundColor = 'var(--color2)';
-    document.querySelector(`.circle-${computer.result[1]}`).style.color = 'var(--color3)';
-    document.querySelector(`.circle-${computer.result[1]}`).innerText = 'o';
-    document.querySelector(`.square2-${computer.result[1]}`).style.boxShadow = 'none';
-    document.querySelector(`.square2-${computer.result[1]}`).style.opacity = 1;
+    if (board.length !== 0) {
 
-    document.querySelector(`.square2-${computer.result[2]}`).style.transition = 'background-color 1s';
-    document.querySelector(`.square2-${computer.result[2]}`).style.backgroundColor = 'var(--color2)';
-    document.querySelector(`.circle-${computer.result[2]}`).style.color = 'var(--color3)';
-    document.querySelector(`.circle-${computer.result[2]}`).innerText = 'z';
-    document.querySelector(`.square2-${computer.result[2]}`).style.boxShadow = 'none';
-    document.querySelector(`.square2-${computer.result[2]}`).style.opacity = 1;
-
-    let timer1;
-    timer1 = setTimeout(() => {
       document.querySelectorAll('.square1').forEach((element) => {
-        element.style.display = 'none';
+        element.style.opacity = 0;
       })
-
       document.querySelectorAll('.square2').forEach((element) => {
         element.style.opacity = 0;
+      })
+
+      document.querySelector(`.square2-${computer.result[0]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square2-${computer.result[0]}`).style.backgroundColor = 'var(--color2)';
+      document.querySelector(`.circle-${computer.result[0]}`).style.color = 'var(--color3)';
+      document.querySelector(`.circle-${computer.result[0]}`).innerText = 's';
+      document.querySelector(`.square2-${computer.result[0]}`).style.boxShadow = 'none';
+      document.querySelector(`.square2-${computer.result[0]}`).style.opacity = 1;
+
+      document.querySelector(`.square2-${computer.result[1]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square2-${computer.result[1]}`).style.backgroundColor = 'var(--color2)';
+      document.querySelector(`.circle-${computer.result[1]}`).style.color = 'var(--color3)';
+      document.querySelector(`.circle-${computer.result[1]}`).innerText = 'o';
+      document.querySelector(`.square2-${computer.result[1]}`).style.boxShadow = 'none';
+      document.querySelector(`.square2-${computer.result[1]}`).style.opacity = 1;
+
+      document.querySelector(`.square2-${computer.result[2]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square2-${computer.result[2]}`).style.backgroundColor = 'var(--color2)';
+      document.querySelector(`.circle-${computer.result[2]}`).style.color = 'var(--color3)';
+      document.querySelector(`.circle-${computer.result[2]}`).innerText = 'z';
+      document.querySelector(`.square2-${computer.result[2]}`).style.boxShadow = 'none';
+      document.querySelector(`.square2-${computer.result[2]}`).style.opacity = 1;
+      document.querySelectorAll('.square1').forEach((element) => {
+        element.style.transition = '1s';
+      })
+      computerScoreUpdate();
+      let timer1;
+      timer1 = setTimeout(() => {
+        document.querySelectorAll('.square1').forEach((element) => {
+          element.style.display = 'none';
+        })
+
         document.querySelectorAll('.square2').forEach((element) => {
-          element.style.display = 'flex';
+          element.style.opacity = 0;
+          document.querySelectorAll('.square2').forEach((element) => {
+            element.style.display = 'flex';
+          })
         })
-      })
-    }, 1500)
+      }, 1000)
 
-    let timer2;
-    timer2 = setTimeout(() => {
-      document.querySelectorAll('.circle').forEach((element) => {
-        element.style.opacity = 0;
-        element.style.color = 'var(--color3)'
-      })
-
-      document.querySelector(`.circle-${1}`).innerText = 't';
-      document.querySelector(`.circle-${2}`).innerText = 'r';
-      document.querySelector(`.circle-${3}`).innerText = 'y';
-      document.querySelector(`.circle-${4}`).innerText = '';
-      document.querySelector(`.circle-${5}`).innerText = 'a';
-      document.querySelector(`.circle-${6}`).innerText = 'g';
-      document.querySelector(`.circle-${7}`).innerText = 'a';
-      document.querySelector(`.circle-${8}`).innerText = 'i';
-      document.querySelector(`.circle-${9}`).innerText = 'n';
-
-      document.querySelector('.scoreboard').style.opacity = 0;
-      for (let i = 1; i < 10; i++) {
-        let newTimer;
-        newTimer = setTimeout(() => {
-          document.querySelector(`.square2-${i}`).style.backgroundColor = 'var(--color1)';
-          document.querySelector(`.square2-${i}`).style.boxShadow = 'none';
-          document.querySelector(`.square2-${i}`).style.border = 'none';
-          document.querySelector(`.square2-${i}`).style.opacity = 1;
-          document.querySelector(`.circle-${i}`).style.opacity = 1
-          document.querySelector(`.circle-${i}`).style.color = 'var(--color2)'
-
-          let newTimer2;
-          newTimer2 = setTimeout(() => {
-            document.querySelector('.container').style.opacity = 0;
-
-
-          }, 1000)
+      let timer2;
+      timer2 = setTimeout(() => {
+        document.querySelectorAll('.circle').forEach((element) => {
+          element.style.opacity = 0;
+          element.style.color = 'var(--color3)'
         })
-      }
-    }, 1500)
-    let newTimer3;
-    newTimer3 = setTimeout(() => {
-      location.reload();
-    }, 3500)
+
+        document.querySelector(`.circle-${1}`).innerText = 't';
+        document.querySelector(`.circle-${2}`).innerText = 'r';
+        document.querySelector(`.circle-${3}`).innerText = 'y';
+        document.querySelector(`.circle-${4}`).innerText = '';
+        document.querySelector(`.circle-${5}`).innerText = 'a';
+        document.querySelector(`.circle-${6}`).innerText = 'g';
+        document.querySelector(`.circle-${7}`).innerText = 'a';
+        document.querySelector(`.circle-${8}`).innerText = 'i';
+        document.querySelector(`.circle-${9}`).innerText = 'n';
+
+        document.querySelector('.scoreboard').style.opacity = 0;
+        for (let i = 1; i < 10; i++) {
+          let newTimer;
+          newTimer = setTimeout(() => {
+            document.querySelector(`.square2-${i}`).style.backgroundColor = 'var(--color1)';
+            document.querySelector(`.square2-${i}`).style.boxShadow = 'none';
+            document.querySelector(`.square2-${i}`).style.border = 'none';
+            document.querySelector(`.square2-${i}`).style.opacity = 1;
+            document.querySelector(`.circle-${i}`).style.opacity = 1
+            document.querySelector(`.circle-${i}`).style.color = 'var(--color2)'
+
+            let newTimer2;
+            newTimer2 = setTimeout(() => {
+              document.querySelector('.container').style.opacity = 0;
+
+
+            }, 1000)
+          })
+        }
+      }, 1200)
+      let newTimer3;
+      newTimer3 = setTimeout(() => {
+        location.reload();
+      }, 2500)
+    }
   }
 };
 
-let userWins = 20;
-let computerWins = 20;
-
-if (localStorage.getItem('username') === null) {
-  generateInitialDialog()
+let userWins;
+if (localStorage.getItem('userwins') === null) {
+  userWins = 0
 } else {
-  user.name = localStorage.getItem('username');
-  computer.name = localStorage.getItem('computername')
+  userWins = JSON.parse(localStorage.getItem('userwins'));
+};
+
+let computerWins;
+if (localStorage.getItem('computerwins') === null) {
+  computerWins = 0;
+} else {
+  computerWins = JSON.parse(localStorage.getItem('computerwins'))
+}
+
+if (localStorage.getItem('computername') === null) {
+  startTheFilp();
+} else {
+  userName = localStorage.getItem('username');
+  computerName = localStorage.getItem('computername')
   generateBoard();
   setTimeout(() => {
-    document.querySelector('.username').innerText = `${user.name}`
-    document.querySelector('.machinename').innerText = `${computer.name}`
-
+    document.querySelector('.username').innerText = `${userName}`
+    document.querySelector('.machinename').innerText = `${computerName}`
   }, 100);
   computer.generateMove();
 }
+
+
 
 function checkFormula(player, a, b, c) {
   if (player.moves.includes(a) &&
@@ -365,7 +525,8 @@ function checkForVictory(player) {
     checkFormula(player, 3, 6, 9) === "victory" ||
     checkFormula(player, 4, 5, 6) === "victory" ||
     checkFormula(player, 7, 8, 9) === "victory") {
-    return "victory"
+
+      return "victory"
   }
 };
 
@@ -413,12 +574,12 @@ function generateScoreBoard() {
   document.body.appendChild(scoreboard);
   setTimeout(() => {
     document.querySelector('.scoreboard').style.opacity = 1;
+    document.querySelector('.machineScoreText').innerText = `${computerWins}`
   }, 1)
 };
 
-generateScoreBoard();
-
 function generateInitialDialog() {
+
   const dialog = document.createElement('dialog');
   dialog.setAttribute('class', 'dialog');
   dialog.setAttribute('open', 'no');
@@ -439,22 +600,30 @@ function generateInitialDialog() {
   document.body.appendChild(dialog);
   setTimeout(() => {
     document.querySelector('.dialog').setAttribute('open', 'yes');
-    document.querySelector('.dialog').style.opacity = 1;
+    setTimeout(() => { document.querySelector('.dialog').style.opacity = 1; }, 100)
     document.querySelector('.input').focus();
+    document.querySelector('.input').setAttribute('onKeyDown', 'keydownUserSubmit()');
   }, 10)
 };
 
-
+function keydownUserSubmit() {
+  if (event.key === 'Enter') {
+    submitUserName();
+  }
+}
 
 function submitUserName() {
   if (!document.querySelector('.input').value) {
-    user.name = 'Player One'
-    document.querySelector('.username').innerText = `${user.name}`;
+    userName = 'Player One'
+    document.querySelector('.username').innerText = `${userName}`;
+    localStorage.setItem('username', userName);
   } else {
-    user.name = document.querySelector('.input').value.toString();
-    document.querySelector('.username').innerText = `${user.name}`;
-    localStorage.setItem('username', user.name);
+    userName = document.querySelector('.input').value.toString();
+    document.querySelector('.username').innerText = `${userName}`;
+    localStorage.setItem('username', userName);
   }
+  document.querySelector('.input').removeAttribute('onKeyDown');
+  document.querySelector('.input').setAttribute('onKeyDown', 'keydownComputerSubmit()');
   document.querySelector('.submit-button').setAttribute('onclick', 'submitComputerName()');
   document.querySelector('.input').value = '';
   document.querySelector('.input').setAttribute('placeholder', 'Set a name for the computer');
@@ -463,41 +632,57 @@ function submitUserName() {
   setTimeout(() => {
     document.querySelector('.username').classList.remove('animate');
     document.querySelector('.scoreboard').classList.remove('flashScoreboard');
+    document.querySelector('.input').focus();
 
   }, 700)
 
 };
+let message;
+
+function keydownComputerSubmit() {
+  if (event.key === 'Enter') {
+    submitComputerName();
+  }
+}
 
 function submitComputerName() {
+  document.querySelector('dialog').style.opacity = 0;
   if (!document.querySelector('.input').value) {
-    computer.name = 'Computer'
-    document.querySelector('.machinename').innerText = `${computer.name}`;
+    computerName = 'Computer'
+    document.querySelector('.machinename').innerText = `${computerName}`;
+    localStorage.setItem('computername', computerName);
   } else {
-    computer.name = document.querySelector('.input').value.toString();
-    document.querySelector('.machinename').innerText = `${computer.name}`;
-    localStorage.setItem('computername', computer.name);
+    computerName = document.querySelector('.input').value.toString();
+    document.querySelector('.machinename').innerText = `${computerName}`;
+    localStorage.setItem('computername', computerName);
   }
-  document.querySelector('.machinename').classList.add('animate');
+  document.querySelector('.machinename').classList.add('animate2');
   document.querySelector('.dialog').remove();
+
 
   document.querySelector('.scoreboard').classList.add('flashScoreboard');
   setTimeout(() => {
-    document.querySelector('.username').classList.remove('animate');
-    document.querySelector('.scoreboard').classList.remove('flashScoreboard')
+    document.querySelector('.username').classList.remove('animate2');
+    document.querySelector('.scoreboard').classList.remove('flashScoreboard');
+    // document.querySelector('.envelope').remove();
+    location.reload();
   }, 700)
 
-  generateBoard();
-  computer.generateMove();
 };
 
+
 function checkForDraw() {
-  if (board.length === 0) {
-    setTimeout(() => {endInDraw();
-    }, 300)}
+  if (checkForVictory !== "victory" && board.length === 0) {
+    setTimeout(() => {
+      endInDraw();
+    }, 150)
+  }
 };
 
 function endInDraw() {
-  if (user.moves.length = 4) {
+
+  if (user.moves.length === 5 || computer.moves.length === 5) {
+
     document.querySelectorAll('.square1').forEach((element) => {
       element.style.opacity = 0;
       element.style.border = 'none';
@@ -507,6 +692,9 @@ function endInDraw() {
     })
 
     user.moves.sort();
+
+    document.querySelector('.scoreboard').style.height = '0vh'
+    document.querySelector('.scoreboard').style.opacity = "0";
 
     document.querySelector(`.square1-${user.moves[0]}`).style.transition = 'background-color 1s';
     document.querySelector(`.square1-${user.moves[0]}`).style.backgroundColor = 'var(--color2)';
@@ -567,7 +755,6 @@ function endInDraw() {
       document.querySelector(`.circle-${8}`).innerText = 'i';
       document.querySelector(`.circle-${9}`).innerText = 'n';
 
-      document.querySelector('.scoreboard').style.opacity = 0;
       for (let i = 1; i < 10; i++) {
         let newTimer;
         newTimer = setTimeout(() => {
@@ -591,6 +778,115 @@ function endInDraw() {
     newTimer3 = setTimeout(() => {
       location.reload();
     }, 3500)
-  
+
   }
+}
+
+function flipHeads() {
+
+  document.querySelector('.scene').classList.remove('flip5');
+  document.getElementById('main-div').classList.remove('flip4');
+  document.querySelector('.btns-container').style.transition = '400ms';
+  document.querySelector('.btns-container').style.opacity = 0;
+  document.querySelector('.paragraph').style.transition = '200ms';
+  document.querySelector('.paragraph').style.opacity = 0;
+
+  if (Math.random() > 0.5) {
+    document.getElementById('main-div').classList.add('flip1');
+    document.querySelector('.scene').classList.add('flip2');
+    setTimeout(() => { generateP2('Tails') }, 300)
+
+  } else {
+
+    document.getElementById('main-div').classList.add('flip1');
+    document.querySelector('.scene').classList.add('flip3');
+    setTimeout(() => { generateP2('Heads') }, 300)
+  }
+}
+
+
+function flipTails() {
+
+  document.querySelector('.scene').classList.remove('flip5');
+  document.getElementById('main-div').classList.remove('flip4');
+  document.querySelector('.btns-container').style.transition = '400ms';
+  document.querySelector('.btns-container').style.opacity = 0;
+  document.querySelector('.paragraph').style.transition = '200ms';
+  document.querySelector('.paragraph').style.opacity = 0;
+
+  if (Math.random() > 0.5) {
+    document.getElementById('main-div').classList.add('flip1');
+    document.querySelector('.scene').classList.add('flip2');
+    setTimeout(() => { generateP2('Heads') }, 300)
+
+  } else {
+
+    document.getElementById('main-div').classList.add('flip1');
+    document.querySelector('.scene').classList.add('flip3');
+    setTimeout(() => { generateP2('Tails') }, 300)
+  }
+}
+
+
+
+
+
+function startTheFilp() {
+  const paragraph = document.createElement('p');
+  paragraph.setAttribute('class', 'paragraph');
+  paragraph.innerHTML = `Let's flip a coin to decide who plays first.`
+  document.querySelector('.envelope').appendChild(paragraph);
+
+  setTimeout(() => {
+
+    document.querySelector('.paragraph').style.opacity = 1;
+    document.getElementById('main-div').style.opacity = 1;
+    document.querySelector('.btns-container').style.opacity = 1;
+  }, 400)
+}
+
+
+function generateP2(result) {
+  if (result === 'Heads') {
+    message = "Computer will play first."
+  } else {
+    message = "Congrats, you'll play first!"
+  }
+
+  document.getElementById('main-div').classList.add('flip1');
+  document.querySelector('.scene').classList.add('flip2');
+
+  document.querySelector('.paragraph').innerText = `${message}`;
+  document.querySelector('.paragraph').style.transition = '1000ms'
+  setTimeout(() => {
+    document.querySelector('.paragraph').style.opacity = 1;
+    document.getElementById('main-div').style.transition = '1s';
+    setTimeout(() => {
+      document.getElementById('main-div').style.opacity = '0';
+      document.querySelector('.paragraph').style.opacity = '0';
+      setTimeout(() => {
+        generateInitialDialog();
+        generateScoreBoard();
+      }, 500)
+    }, 1200)
+
+  }, 3000)
+}
+
+function userScoreUpdate() {
+
+  userWins++;
+  localStorage.setItem('userwins', JSON.stringify(userWins));
+  document.querySelector('.userScoreText').classList.add('refresh-score')
+  document.querySelector('.userScoreText').innerText = `${userWins}`
+
+}
+
+function computerScoreUpdate() {
+
+  computerWins++;
+  localStorage.setItem('computerwins', JSON.stringify(computerWins));
+  document.querySelector('.machineScoreText').classList.add('refresh-score')
+  document.querySelector('.machineScoreText').innerText = `${computerWins}`
+
 }
