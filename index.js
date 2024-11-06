@@ -258,11 +258,10 @@ const computer = {
       checkForVictory(user);
       checkForVictory(computer);
       checkForDraw();
-    }, 100)
+    }, 10)
   },
 
   generateMove: () => {
-    console.log('move generated')
     if (checkForVictory(user) !== "victory") {
       setTimeout(() => {
         if (generalCount === 1 || generalCount === 2) {
@@ -279,7 +278,6 @@ const computer = {
 
             let randomMove = Math.floor(Math.random() * board.length)
             computer.play(board[randomMove]);
-            console.log('played here on count ' + (generalCount-1) ); 
           }
 
         }
@@ -297,7 +295,6 @@ const computer = {
 
             let randomMove = Math.floor(Math.random() * board.length)
             computer.play(board[randomMove]);
-            console.log('played here on count ' + (generalCount-1) ); 
           }
 
         } else if (generalCount === 5 || generalCount === 6 || generalCount === 7
@@ -431,10 +428,9 @@ const computer = {
 
             let randomMove = Math.floor(Math.random() * board.length)
             computer.play(board[randomMove]);
-            console.log('played here');
           }
-
         }
+        else {computer.play(3);}
 
         if (checkForVictory(computer) !== "victory") {
           checkForDraw();
@@ -442,8 +438,7 @@ const computer = {
       }, 150)
     }
     checkForDraw()
-    checkForVictory(computer)
-    setTimeout(()=> {console.log(computer.moves)},1000)
+    checkForVictory(computer);
   },
 
   celebrate: () => {
@@ -872,7 +867,6 @@ function endInDraw() {
     } else if (user.moves.length === 5 && isCelabrating === 'no') {
       isCelabrating = 'yes';
 
-      console.log('second celebration');
       document.querySelectorAll('.square1').forEach((element) => {
         element.style.opacity = 0;
         element.style.border = 'none';
@@ -1203,6 +1197,7 @@ function generateAlertForScoreReset() {
 
 
 function closeResetDialog() {
+  document.querySelector('.close-tag').style.opacity = 0;
   document.querySelector('.reset-paragraph').style.opacity = 0;
   document.querySelector('.reset-no-button').style.opacity = 0;
   document.querySelector('.reset-yes-button').style.opacity = 0;
@@ -1219,6 +1214,7 @@ function restartTheGame() {
   document.querySelector('.reset-paragraph').style.opacity = 0;
   document.querySelector('.reset-no-button').style.opacity = 0;
   document.querySelector('.reset-yes-button').style.opacity = 0;
+  
   setTimeout(() => {
     document.querySelector('.dialog-reset').style.height = '0vh';
     document.querySelector('.scoreboard').style.height = '0vh';
@@ -1229,5 +1225,3 @@ function restartTheGame() {
     location.reload();
   }, 1500)
 }
-
-console.log(document.querySelector('.close-tag-x'))

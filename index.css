@@ -983,6 +983,7 @@ h2 {
   border-radius: 100%; 
   color: var(--color3);
   overflow: visible;
+  transition: 300ms;
 }
 
 .close-tag-x {
