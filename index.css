@@ -691,8 +691,11 @@ button.coin-heads:active {
 
 .scoreboard:hover>.user,
 .scoreboard:hover>.machine,
-.scoreboard:hover>.result {
+.scoreboard:hover>.result,
+.scoreboard:hover>.edit-username-input,
+.scoreboard:hover>.edit-machinename-input {
   color: var(--color3);
+  -webkit-text-fill-color: var(--color3);
 }
 
 .user,
@@ -880,4 +883,27 @@ h2 {
   100% {
     opacity: 1;
   }
+}
+
+.edit-username-input,
+.edit-machinename-input {
+  color: var(--color2);
+  border: none;
+  background-color: transparent;
+  text-align: right;
+  font-size: 1.5rem;
+  font-style: italic;
+  outline:none;
+  display:none;
+  caret-color: var(--color1);
+}
+
+.scoreboard:hover>.edit-username-input::selection,
+.scoreboard:hover>.edit-machinename-input::selection,
+.edit-username-input:hover::selection,
+.edit-machinename-input:hover::selection,
+.edit-username-input::selection,
+.edit-machinename-input::selection {
+  caret-color: var(--color1);
+  background-color: var(--color1)
 }

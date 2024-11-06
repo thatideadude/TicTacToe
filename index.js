@@ -1,4 +1,4 @@
-let hue, saturation;
+let hue, saturation, turnToPlay, userName, computerName, isFirstTime, userWins, computerWins, message, hasGameStarted;
 let generalCount = 1;
 
 function generatePalette() {
@@ -16,10 +16,12 @@ document.querySelector('.coin-tails').addEventListener('click', () => {
   flipTails();
 })
 
-let isFirstTime;
-
-let userName;
-let computerName;
+if (localStorage.getItem('hasgamestarted' === null)) {
+  hasGameStarted = 'no';
+} else {
+  hasGameStarted = 'yes';
+  setTimeout(() => {localStorage.setItem('hasgamestarted', hasGameStarted)}, 10000)
+}
 
 function generateBoard() {
   if (localStorage.getItem('isfirsttime') !== 'no') {
@@ -35,13 +37,14 @@ function generateBoard() {
   document.querySelector('body').style.opacity = 0;
   timer = setTimeout(() => { document.querySelector('body').style.opacity = 1 }, 100);
 
-  generateScoreBoard();
-  // document.querySelector('.container').remove();
   const container = document.createElement('div')
   container.setAttribute('class', 'container');
   container.style.opacity = "0";
   document.body.append(container);
   document.querySelector('.container').style.opacity = 1;
+
+
+
   let i = 1;
   for (let a = 1; a <= 3; a++) {
     const row = document.createElement('div');
@@ -70,19 +73,27 @@ function generateBoard() {
       row.appendChild(square2);
       row.style.opacity = 0;
       document.querySelector('.container').appendChild(row);
+
       setTimeout(() => {
+
         document.querySelectorAll('.row').forEach((element) => {
           element.style.opacity = 1;
         }, 100)
       })
       i++;
     }
-  }
+    setTimeout(() => {
+      hasGameStarted = 'yes';
+      localStorage.setItem('hasGameStarted', hasGameStarted)
+    }, 1200)
+
+  } if (localStorage.getItem('turntoplay') === 'computer') {
+    computer.generateMove();
+  } else { generalCount++ }
+
 };
 
 let board = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-
 
 const user = {
   name: '',
@@ -102,7 +113,6 @@ const user = {
 
   makeMove: (i) => {
     generalCount++;
-
     if (checkForVictory(computer) !== "victory") {
 
       document.querySelector(`.cross-${i}`).style.display = 'flex';
@@ -120,15 +130,16 @@ const user = {
           square.removeAttribute('onmouseover');
 
         })
-        user.celebrate()
       } else {
         computer.generateMove();
       }
-    } else { return }
+    }
   },
 
   celebrate: () => {
     userScoreUpdate();
+    turnToPlay = 'user'
+    localStorage.setItem('turntoplay', turnToPlay)
 
     document.querySelectorAll('.square1').forEach((element) => {
       element.style.opacity = 0;
@@ -237,11 +248,14 @@ const computer = {
     computer.showMove(number);
     computer.moves.push(number);
     generalCount++;
+    console.log(generalCount)
   },
 
   generateMove: () => {
+    if (board.length === 0) { checkForVictory(user) };
     if (checkForVictory(user) !== "victory") {
       setTimeout(() => {
+        setTimeout(() => { checkForDraw(); }, 400)
         if (generalCount === 1) {
           randomMove1 = Math.floor(Math.random() * 4);
           if (randomMove1 === 0) {
@@ -253,7 +267,10 @@ const computer = {
           } else if (randomMove1 === 3) {
             computer.play(9)
           }
-        } else if (generalCount === 3) {
+
+        }
+
+        else if (generalCount === 3) {
           if (board.includes(1) && !computer.moves.includes(1)) {
             computer.play(1);
           } else if (board.includes(3) && !computer.moves.includes(3)) {
@@ -263,130 +280,145 @@ const computer = {
           } else if (board.includes(9) && !computer.moves.includes(9)) {
             computer.play(9);
           }
-        } else if (generalCount === 5 || generalCount === 7 || generalCount === 9) {
 
+        } else if (generalCount === 5 || generalCount === 7 || generalCount === 9) {
           if (computer.moves.includes(1) && computer.moves.includes(2) && board.includes(3)) {
             computer.play(3);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(2)) {
-            //   computer.play(2);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(4) && board.includes(7)) {
-            //   computer.play(7);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(5) && board.includes(9)) {
-            //   computer.play(9);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(4)) {
-            //   computer.play(4);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(5)) {
-            //   computer.play(5);
+          } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(2)) {
+            computer.play(2);
+          } else if (computer.moves.includes(1) && computer.moves.includes(4) && board.includes(7)) {
+            computer.play(7);
+          } else if (computer.moves.includes(1) && computer.moves.includes(5) && board.includes(9)) {
+            computer.play(9);
+          } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(4)) {
+            computer.play(4);
+          } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(5)) {
+            computer.play(5);
 
-            // } else if (computer.moves.includes(3) && computer.moves.includes(1) && board.includes(2)) {
-            //   computer.play(2);
-            // } else if (computer.moves.includes(3) && computer.moves.includes(2) && board.includes(1)) {
-            //   computer.play(1);
-            // } else if (computer.moves.includes(3) && computer.moves.includes(5) && board.includes(7)) {
-            //   computer.play(7);
-            // } else if (computer.moves.includes(3) && computer.moves.includes(6) && board.includes(9)) {
-            //   computer.play(9);
-            // } else if (computer.moves.includes(3) && computer.moves.includes(7) && board.includes(5)) {
-            //   computer.play(5);
-            // } else if (computer.moves.includes(3) && computer.moves.includes(9) && board.includes(6)) {
-            //   computer.play(6);
+          } else if (computer.moves.includes(3) && computer.moves.includes(1) && board.includes(2)) {
+            computer.play(2);
+          } else if (computer.moves.includes(3) && computer.moves.includes(2) && board.includes(1)) {
+            computer.play(1);
+          } else if (computer.moves.includes(3) && computer.moves.includes(5) && board.includes(7)) {
+            computer.play(7);
+          } else if (computer.moves.includes(3) && computer.moves.includes(6) && board.includes(9)) {
+            computer.play(9);
+          } else if (computer.moves.includes(3) && computer.moves.includes(7) && board.includes(5)) {
+            computer.play(5);
+          } else if (computer.moves.includes(3) && computer.moves.includes(9) && board.includes(6)) {
+            computer.play(6);
 
-            // } else if (computer.moves.includes(7) && computer.moves.includes(9) && board.includes(8)) {
-            //   computer.play(8);
-
-
-
-            // } else if (user.moves.includes(1) && user.moves.includes(2) && board.includes(3)) {
-            //   computer.play(3);
-            // } else if (user.moves.includes(1) && user.moves.includes(3) && board.includes(2)) {
-            //   computer.play(2);
-            // } else if (user.moves.includes(1) && user.moves.includes(4) && board.includes(7)) {
-            //   computer.play(7);
-            // } else if (user.moves.includes(1) && user.moves.includes(7) && board.includes(4)) {
-            //   computer.play(4);
-            // } else if (user.moves.includes(1) && user.moves.includes(5) && board.includes(9)) {
-            //   computer.play(9);
-            // } else if (user.moves.includes(1) && user.moves.includes(9) && board.includes(5)) {
-            //   computer.play(5);
+          } else if (computer.moves.includes(7) && computer.moves.includes(9) && board.includes(8)) {
+            computer.play(8);
 
 
-            // } else if (user.moves.includes(2) && user.moves.includes(3) && board.includes(1)) {
-            //   computer.play(1);
-            // } else if (user.moves.includes(2) && user.moves.includes(5) && board.includes(8)) {
-            //   computer.play(8);
-            // } else if (user.moves.includes(2) && user.moves.includes(8) && board.includes(5)) {
-            //   computer.play(5);
 
-            // } else if (user.moves.includes(3) && user.moves.includes(5) && board.includes(7)) {
-            //   computer.play(7);
-            // } else if (user.moves.includes(3) && user.moves.includes(6) && board.includes(9)) {
-            //   computer.play(9);
-            // } else if (user.moves.includes(3) && user.moves.includes(7) && board.includes(5)) {
-            //   computer.play(5);
-            // } else if (user.moves.includes(3) && user.moves.includes(9) && board.includes(6)) {
-            //   computer.play(6);
+          } else if (user.moves.includes(1) && user.moves.includes(2) && board.includes(3)) {
+            computer.play(3);
+          } else if (user.moves.includes(1) && user.moves.includes(3) && board.includes(2)) {
+            computer.play(2);
+          } else if (user.moves.includes(1) && user.moves.includes(4) && board.includes(7)) {
+            computer.play(7);
+          } else if (user.moves.includes(1) && user.moves.includes(7) && board.includes(4)) {
+            computer.play(4);
+          } else if (user.moves.includes(1) && user.moves.includes(5) && board.includes(9)) {
+            computer.play(9);
+          } else if (user.moves.includes(1) && user.moves.includes(9) && board.includes(5)) {
+            computer.play(5);
 
-            // } else if (user.moves.includes(4) && user.moves.includes(5) && board.includes(6)) {
-            //   computer.play(6);
-            // } else if (user.moves.includes(4) && user.moves.includes(7) && board.includes(1)) {
-            //   computer.play(1);
 
-            // } else if (user.moves.includes(5) && user.moves.includes(6) && board.includes(4)) {
-            //   computer.play(4);
-            // } else if (user.moves.includes(5) && user.moves.includes(7) && board.includes(3)) {
-            //   computer.play(3);
-            // } else if (user.moves.includes(5) && user.moves.includes(8) && board.includes(2)) {
-            //   computer.play(2);
+          } else if (user.moves.includes(2) && user.moves.includes(3) && board.includes(1)) {
+            computer.play(1);
+          } else if (user.moves.includes(2) && user.moves.includes(5) && board.includes(8)) {
+            computer.play(8);
+          } else if (user.moves.includes(2) && user.moves.includes(8) && board.includes(5)) {
+            computer.play(5);
 
-            // } else if (user.moves.includes(6) && user.moves.includes(9) && board.includes(3)) {
-            //   computer.play(3);
+          } else if (user.moves.includes(3) && user.moves.includes(5) && board.includes(7)) {
+            computer.play(7);
+          } else if (user.moves.includes(3) && user.moves.includes(6) && board.includes(9)) {
+            computer.play(9);
+          } else if (user.moves.includes(3) && user.moves.includes(7) && board.includes(5)) {
+            computer.play(5);
+          } else if (user.moves.includes(3) && user.moves.includes(9) && board.includes(6)) {
+            computer.play(6);
 
-            // } else if (user.moves.includes(7) && user.moves.includes(8) && board.includes(9)) {
-            //   computer.play(9);
-            // } else if (user.moves.includes(7) && user.moves.includes(9) && board.includes(8)) {
-            //   computer.play(8);
+          } else if (user.moves.includes(4) && user.moves.includes(5) && board.includes(6)) {
+            computer.play(6);
+          } else if (user.moves.includes(4) && user.moves.includes(6) && board.includes(5)) {
+            computer.play(5);
+          } else if (user.moves.includes(4) && user.moves.includes(7) && board.includes(1)) {
+            computer.play(1);
 
-            // } else if (user.moves.includes(8) && user.moves.includes(9) && board.includes(7)) {
-            //   computer.play(7);
+          } else if (user.moves.includes(5) && user.moves.includes(6) && board.includes(4)) {
+            computer.play(4);
+          } else if (user.moves.includes(5) && user.moves.includes(7) && board.includes(3)) {
+            computer.play(3);
+          } else if (user.moves.includes(5) && user.moves.includes(8) && board.includes(2)) {
+            computer.play(2);
 
-            // } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(7)) {
-            //   computer.play(7);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(9)) {
-            //   computer.play(9);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(9)) {
-            //   computer.play(9);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(3)) {
-            //   computer.play(3);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(7)) {
-            //   computer.play(7);
-            // } else if (computer.moves.includes(3) && computer.moves.includes(7) && board.includes(9)) {
-            //   computer.play(9);
-            // } else if (computer.moves.includes(3) && computer.moves.includes(9) && board.includes(7)) {
-            //   computer.play(7);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(3)) {
-            //   computer.play(3);
-            // } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(3)) {
+          } else if (user.moves.includes(6) && user.moves.includes(9) && board.includes(3)) {
+            computer.play(3);
+
+          } else if (user.moves.includes(7) && user.moves.includes(8) && board.includes(9)) {
+            computer.play(9);
+          } else if (user.moves.includes(7) && user.moves.includes(9) && board.includes(8)) {
+            computer.play(8);
+
+          } else if (user.moves.includes(8) && user.moves.includes(9) && board.includes(7)) {
+            computer.play(7);
+
+          } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(7)) {
+            computer.play(7);
+          } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(9)) {
+            computer.play(9);
+          } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(9)) {
+            computer.play(9);
+          } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(3)) {
+            computer.play(3);
+          } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(7)) {
+            computer.play(7);
+          } else if (computer.moves.includes(3) && computer.moves.includes(7) && board.includes(9)) {
+            computer.play(9);
+          } else if (computer.moves.includes(3) && computer.moves.includes(9) && board.includes(7)) {
+            computer.play(7);
+          } else if (computer.moves.includes(1) && computer.moves.includes(9) && board.includes(3)) {
+            computer.play(3);
+          } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(3)) {
             //   //   computer.play(3);
+          } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(3)) {
+            computer.play(3);
           } else {
+
             let randomMove = Math.floor(Math.random() * board.length)
             computer.play(board[randomMove]);
+            console.log('played here');
           }
 
-
-
-        }
+        } 
+        // else {
+        //   let randomMove = Math.floor(Math.random() * board.length)
+        //   computer.play(board[randomMove]);
+        //   console.log('played here');
+        // }
 
         if (checkForVictory(computer) === "victory") {
-          setTimeout(() => { computer.celebrate(); }, 200)
-        } else { checkForDraw();}
+          //   computer.celebrate();
+          // } else {
+          checkForDraw();
+        }
       }, 150)
     }
+    // checkForVictory(computer)
+    checkForDraw();
+
   },
 
   celebrate: () => {
-
-    if (board.length !== 0) {
-
+    if (isCelabrating === 'no') {
+      isCelabrating = 'yes';
+      turnToPlay = 'computer';
+      localStorage.setItem('turntoplay', turnToPlay)
       document.querySelectorAll('.square1').forEach((element) => {
         element.style.opacity = 0;
       })
@@ -473,18 +505,18 @@ const computer = {
       newTimer3 = setTimeout(() => {
         location.reload();
       }, 2500)
+
     }
   }
 };
+let isCelabrating = "no";
 
-let userWins;
 if (localStorage.getItem('userwins') === null) {
   userWins = 0
 } else {
   userWins = JSON.parse(localStorage.getItem('userwins'));
 };
 
-let computerWins;
 if (localStorage.getItem('computerwins') === null) {
   computerWins = 0;
 } else {
@@ -497,14 +529,13 @@ if (localStorage.getItem('computername') === null) {
   userName = localStorage.getItem('username');
   computerName = localStorage.getItem('computername')
   generateBoard();
+  generateScoreBoard();
   setTimeout(() => {
     document.querySelector('.username').innerText = `${userName}`
     document.querySelector('.machinename').innerText = `${computerName}`
   }, 100);
-  computer.generateMove();
+  // computer.generateMove();
 }
-
-
 
 function checkFormula(player, a, b, c) {
   if (player.moves.includes(a) &&
@@ -526,15 +557,20 @@ function checkForVictory(player) {
     checkFormula(player, 4, 5, 6) === "victory" ||
     checkFormula(player, 7, 8, 9) === "victory") {
 
-      return "victory"
+    if (player === computer) {
+      computer.celebrate();
+    } else {
+      user.celebrate();
+    }
+    return "victory"
   }
 };
 
-
 function generateScoreBoard() {
+
   const scoreboard = document.createElement('div');
   scoreboard.setAttribute('class', 'scoreboard');
-  scoreboard.setAttribute('onclick', 'generatePalette()');
+  // scoreboard.setAttribute('onclick', 'generatePalette()');
   scoreboard.style.opacity = 0;
   const user = document.createElement('div');
   user.setAttribute('class', 'user');
@@ -545,20 +581,20 @@ function generateScoreBoard() {
   const score = document.createElement('div');
   score.setAttribute('class', 'result');
   const userScore = document.createElement('div');
-  userScore.setAttribute('class', 'userScoreDiv')
+  userScore.setAttribute('class', 'userScoreDiv');
   score.appendChild(userScore);
 
   const userScoreText = document.createElement('h2');
-  userScoreText.setAttribute('class', 'userScoreText')
+  userScoreText.setAttribute('class', 'userScoreText');
   userScoreText.innerText = `${userWins}`;
   score.appendChild(userScoreText);
 
   const machineScore = document.createElement('div');
-  machineScore.setAttribute('class', 'machineScoreDiv')
+  machineScore.setAttribute('class', 'machineScoreDiv');
   score.appendChild(machineScore);
 
   const machineScoreText = document.createElement('h2');
-  machineScoreText.setAttribute('class', 'machineScoreText')
+  machineScoreText.setAttribute('class', 'machineScoreText');
   machineScoreText.innerText = `${computerWins}`;
   score.appendChild(machineScoreText);
 
@@ -572,10 +608,29 @@ function generateScoreBoard() {
   machinename.setAttribute('class', 'machinename')
   machine.appendChild(machinename);
   document.body.appendChild(scoreboard);
+
+  const usernameEdit = document.createElement('input');
+  usernameEdit.setAttribute('class', 'edit-username-input');
+  usernameEdit.setAttribute('value', `${userName}`)
+  document.querySelector('.user').appendChild(usernameEdit);
+
+  const machinenameEdit = document.createElement('input');
+  machinenameEdit.setAttribute('class', 'edit-machinename-input');
+  machinenameEdit.setAttribute('value', `${computerName}`)
+  document.querySelector('.machine').appendChild(machinenameEdit);
+
+  if (localStorage.getItem('isfirsttime') !== 'no') {
+    document.querySelector('.scoreboard').style.height = '0px';
+  }
+
+  document.querySelector('.scoreboard').style.opacity = 1;
+
   setTimeout(() => {
-    document.querySelector('.scoreboard').style.opacity = 1;
+    if (localStorage.getItem('isfirsttime') !== 'no') {
+      document.querySelector('.scoreboard').style.height = '15vh';
+    }
     document.querySelector('.machineScoreText').innerText = `${computerWins}`
-  }, 1)
+  }, 500)
 };
 
 function generateInitialDialog() {
@@ -637,7 +692,7 @@ function submitUserName() {
   }, 700)
 
 };
-let message;
+
 
 function keydownComputerSubmit() {
   if (event.key === 'Enter') {
@@ -664,15 +719,15 @@ function submitComputerName() {
   setTimeout(() => {
     document.querySelector('.username').classList.remove('animate2');
     document.querySelector('.scoreboard').classList.remove('flashScoreboard');
-    // document.querySelector('.envelope').remove();
-    location.reload();
-  }, 700)
+
+    generateBoard();
+  }, 1200)
 
 };
 
-
 function checkForDraw() {
-  if (checkForVictory !== "victory" && board.length === 0) {
+
+  if (board.length === 0 && checkForVictory(user) !== "victory" && checkForVictory(computer) !== "victory") {
     setTimeout(() => {
       endInDraw();
     }, 150)
@@ -795,15 +850,17 @@ function flipHeads() {
     document.getElementById('main-div').classList.add('flip1');
     document.querySelector('.scene').classList.add('flip2');
     setTimeout(() => { generateP2('Tails') }, 300)
+    turnToPlay = "user";
 
   } else {
-
     document.getElementById('main-div').classList.add('flip1');
     document.querySelector('.scene').classList.add('flip3');
     setTimeout(() => { generateP2('Heads') }, 300)
+    turnToPlay = "computer";
   }
-}
+  localStorage.setItem('turntoplay', turnToPlay)
 
+}
 
 function flipTails() {
 
@@ -818,18 +875,16 @@ function flipTails() {
     document.getElementById('main-div').classList.add('flip1');
     document.querySelector('.scene').classList.add('flip2');
     setTimeout(() => { generateP2('Heads') }, 300)
-
+    turnToPlay = "computer";
   } else {
 
     document.getElementById('main-div').classList.add('flip1');
     document.querySelector('.scene').classList.add('flip3');
-    setTimeout(() => { generateP2('Tails') }, 300)
+    setTimeout(() => { generateP2('Tails') }, 300);
+    turnToPlay = "user"
   }
+  localStorage.setItem('turntoplay', turnToPlay)
 }
-
-
-
-
 
 function startTheFilp() {
   const paragraph = document.createElement('p');
@@ -844,7 +899,6 @@ function startTheFilp() {
     document.querySelector('.btns-container').style.opacity = 1;
   }, 400)
 }
-
 
 function generateP2(result) {
   if (result === 'Heads') {
@@ -883,10 +937,67 @@ function userScoreUpdate() {
 }
 
 function computerScoreUpdate() {
-
   computerWins++;
   localStorage.setItem('computerwins', JSON.stringify(computerWins));
   document.querySelector('.machineScoreText').classList.add('refresh-score')
   document.querySelector('.machineScoreText').innerText = `${computerWins}`
 
 }
+
+
+
+
+if (hasGameStarted === 'yes') {
+
+  document.querySelector('.scoreboard').addEventListener('click', (e) => {
+    if (e.target !== document.querySelector('.username')
+      && e.target !== document.querySelector('.machinename')
+      && e.target !== document.querySelector('.edit-username-input')
+      && e.target !== document.querySelector('.edit-machinename-input')) {
+      generatePalette();
+    }
+  }, { capture: true })
+
+  document.querySelector('.username').addEventListener('dblclick', () => {
+    document.querySelector('.username').style.display = 'none';
+    document.querySelector('.edit-username-input').style.display = 'initial';
+    document.querySelector('.edit-username-input').focus();
+    document.querySelector('.edit-username-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        userName = document.querySelector('.edit-username-input').value;
+        document.querySelector('.edit-username-input').style.display = 'none';
+        document.querySelector('.username').innerText = userName;
+        localStorage.setItem('username', userName);
+        document.querySelector('.username').style.display = 'initial';
+      }
+      if (e.key === 'Escape') {
+        document.querySelector('.edit-username-input').value = userName;
+        document.querySelector('.edit-username-input').style.display = 'none';
+        document.querySelector('.username').style.display = 'initial';
+      }
+    })
+  })
+
+  document.querySelector('.machinename').addEventListener('dblclick', () => {
+    document.querySelector('.machinename').style.display = 'none';
+    document.querySelector('.edit-machinename-input').style.display = 'initial';
+    document.querySelector('.edit-machinename-input').focus();
+    document.querySelector('.edit-machinename-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        machineName = document.querySelector('.edit-machinename-input').value;
+        document.querySelector('.edit-machinename-input').style.display = 'none';
+        document.querySelector('.machinename').innerText = machineName;
+        localStorage.setItem('machinename', machineName);
+        document.querySelector('.machinename').style.display = 'initial';
+      }
+      if (e.key === 'Escape') {
+        document.querySelector('.edit-machinename-input').value = machineName;
+        document.querySelector('.edit-machinename-input').style.display = 'none';
+        document.querySelector('.machinename').style.display = 'initial';
+      }
+    })
+  })
+
+}
+
+
