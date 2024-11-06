@@ -19,8 +19,10 @@ document.querySelector('.coin-tails').addEventListener('click', () => {
 if (localStorage.getItem('hasgamestarted' === null)) {
   hasGameStarted = 'no';
 } else {
-  setTimeout(() => {  hasGameStarted = 'yes';
-    localStorage.setItem('hasgamestarted', hasGameStarted)}, 3000)
+  setTimeout(() => {
+    hasGameStarted = 'yes';
+    localStorage.setItem('hasgamestarted', hasGameStarted)
+  }, 3000)
 }
 
 function generateBoard() {
@@ -78,7 +80,7 @@ function generateBoard() {
 
         document.querySelectorAll('.row').forEach((element) => {
           element.style.opacity = 1;
-        }, 100)
+        }, 50)
       })
       i++;
     }
@@ -237,25 +239,33 @@ const computer = {
 
 
   showMove: (squareNumber) => {
-    const show = document.querySelector(`.square2-${squareNumber}`);
-    const hide = document.querySelector(`.square1-${squareNumber}`);
-    show.style.display = 'flex';
-    hide.style.display = 'none';
+    if (checkForVictory(user) !== "victory"
+      && checkForVictory(computer) !== "victory"
+      && board.length > 0) {
+      const show = document.querySelector(`.square2-${squareNumber}`);
+      const hide = document.querySelector(`.square1-${squareNumber}`);
+      show.style.display = 'flex';
+      hide.style.display = 'none';
+    }
   },
 
   play: (number) => {
-    board.splice(board.indexOf(number), 1);
     computer.showMove(number);
-    computer.moves.push(number);
-    generalCount++;
+    setTimeout(() => {
+      computer.moves.push(number);
+      board.splice(board.indexOf(number), 1);
+      generalCount++;
+      checkForVictory(user);
+      checkForVictory(computer);
+      checkForDraw();
+    }, 100)
   },
 
   generateMove: () => {
-    if (board.length === 0) { checkForVictory(user) };
+    console.log('move generated')
     if (checkForVictory(user) !== "victory") {
       setTimeout(() => {
-        setTimeout(() => { checkForDraw(); }, 400)
-        if (generalCount === 1) {
+        if (generalCount === 1 || generalCount === 2) {
           randomMove1 = Math.floor(Math.random() * 4);
           if (randomMove1 === 0) {
             computer.play(1);
@@ -265,11 +275,16 @@ const computer = {
             computer.play(7)
           } else if (randomMove1 === 3) {
             computer.play(9)
+          } else {
+
+            let randomMove = Math.floor(Math.random() * board.length)
+            computer.play(board[randomMove]);
+            console.log('played here on count ' + (generalCount-1) ); 
           }
 
         }
 
-        else if (generalCount === 3) {
+        else if (generalCount === 3 || generalCount === 4) {
           if (board.includes(1) && !computer.moves.includes(1)) {
             computer.play(1);
           } else if (board.includes(3) && !computer.moves.includes(3)) {
@@ -278,9 +293,16 @@ const computer = {
             computer.play(7);
           } else if (board.includes(9) && !computer.moves.includes(9)) {
             computer.play(9);
+          } else {
+
+            let randomMove = Math.floor(Math.random() * board.length)
+            computer.play(board[randomMove]);
+            console.log('played here on count ' + (generalCount-1) ); 
           }
 
-        } else if (generalCount === 5 || generalCount === 7 || generalCount === 9) {
+        } else if (generalCount === 5 || generalCount === 6 || generalCount === 7
+          || generalCount === 8 || generalCount === 9 || generalCount === 10
+          || generalCount === 11 || generalCount === 12) {
           if (computer.moves.includes(1) && computer.moves.includes(2) && board.includes(3)) {
             computer.play(3);
           } else if (computer.moves.includes(1) && computer.moves.includes(3) && board.includes(2)) {
@@ -387,6 +409,24 @@ const computer = {
             //   //   computer.play(3);
           } else if (computer.moves.includes(1) && computer.moves.includes(7) && board.includes(3)) {
             computer.play(3);
+          } else if (board.includes(1)) {
+            computer.play(1);
+          } else if (board.includes(2)) {
+            computer.play(2);
+          } else if (board.includes(3)) {
+            computer.play(3);
+          } else if (board.includes(4)) {
+            computer.play(4);
+          } else if (board.includes(5)) {
+            computer.play(5);
+          } else if (board.includes(6)) {
+            computer.play(6);
+          } else if (board.includes(7)) {
+            computer.play(7);
+          } else if (board.includes(8)) {
+            computer.play(8);
+          } else if (board.includes(9)) {
+            computer.play(9);
           } else {
 
             let randomMove = Math.floor(Math.random() * board.length)
@@ -394,23 +434,16 @@ const computer = {
             console.log('played here');
           }
 
-        } 
-        // else {
-        //   let randomMove = Math.floor(Math.random() * board.length)
-        //   computer.play(board[randomMove]);
-        //   console.log('played here');
-        // }
+        }
 
-        if (checkForVictory(computer) === "victory") {
-          //   computer.celebrate();
-          // } else {
+        if (checkForVictory(computer) !== "victory") {
           checkForDraw();
         }
       }, 150)
     }
-    // checkForVictory(computer)
-    checkForDraw();
-
+    checkForDraw()
+    checkForVictory(computer)
+    setTimeout(()=> {console.log(computer.moves)},1000)
   },
 
   celebrate: () => {
@@ -584,7 +617,7 @@ function generateScoreBoard() {
   score.appendChild(userScore);
 
   const userScoreText = document.createElement('h2');
-  userScoreText.setAttribute('class', 'userScoreText');
+  userScoreText.setAttribute('class', 'user-score-text');
   userScoreText.innerText = `${userWins}`;
   score.appendChild(userScoreText);
 
@@ -593,7 +626,7 @@ function generateScoreBoard() {
   score.appendChild(machineScore);
 
   const machineScoreText = document.createElement('h2');
-  machineScoreText.setAttribute('class', 'machineScoreText');
+  machineScoreText.setAttribute('class', 'machine-score-text');
   machineScoreText.innerText = `${computerWins}`;
   score.appendChild(machineScoreText);
 
@@ -628,7 +661,7 @@ function generateScoreBoard() {
     if (localStorage.getItem('isfirsttime') !== 'no') {
       document.querySelector('.scoreboard').style.height = '15vh';
     }
-    document.querySelector('.machineScoreText').innerText = `${computerWins}`
+    document.querySelector('.machine-score-text').innerText = `${computerWins}`
   }, 500)
 };
 
@@ -682,10 +715,10 @@ function submitUserName() {
   document.querySelector('.input').value = '';
   document.querySelector('.input').setAttribute('placeholder', 'Set a name for the computer');
   document.querySelector('.username').classList.add('animate');
-  document.querySelector('.scoreboard').classList.add('flashScoreboard');
+
   setTimeout(() => {
     document.querySelector('.username').classList.remove('animate');
-    document.querySelector('.scoreboard').classList.remove('flashScoreboard');
+
     document.querySelector('.input').focus();
 
   }, 700)
@@ -714,10 +747,10 @@ function submitComputerName() {
   document.querySelector('.dialog').remove();
 
 
-  document.querySelector('.scoreboard').classList.add('flashScoreboard');
+
   setTimeout(() => {
     document.querySelector('.username').classList.remove('animate2');
-    document.querySelector('.scoreboard').classList.remove('flashScoreboard');
+
 
     generateBoard();
   }, 1200)
@@ -734,106 +767,214 @@ function checkForDraw() {
 };
 
 function endInDraw() {
-
-  if (user.moves.length === 5 || computer.moves.length === 5) {
-
-    document.querySelectorAll('.square1').forEach((element) => {
-      element.style.opacity = 0;
-      element.style.border = 'none';
-    })
-    document.querySelectorAll('.square2').forEach((element) => {
-      element.style.opacity = 0;
-    })
-
-    user.moves.sort();
-
-    document.querySelector('.scoreboard').style.height = '0vh'
-    document.querySelector('.scoreboard').style.opacity = "0";
-
-    document.querySelector(`.square1-${user.moves[0]}`).style.transition = 'background-color 1s';
-    document.querySelector(`.square1-${user.moves[0]}`).style.backgroundColor = 'var(--color2)';
-    document.querySelector(`.cross-${user.moves[0]}`).style.color = 'var(--color3)';
-    document.querySelector(`.cross-${user.moves[0]}`).innerText = 'd';
-    document.querySelector(`.square1-${user.moves[0]}`).style.boxShadow = 'none';
-    document.querySelector(`.square1-${user.moves[0]}`).style.opacity = 1;
-
-    document.querySelector(`.square1-${user.moves[1]}`).style.transition = 'background-color 1s';
-    document.querySelector(`.square1-${user.moves[1]}`).style.backgroundColor = 'var(--color2)';
-    document.querySelector(`.cross-${user.moves[1]}`).style.color = 'var(--color3)';
-    document.querySelector(`.cross-${user.moves[1]}`).innerText = 'r';
-    document.querySelector(`.square1-${user.moves[1]}`).style.boxShadow = 'none';
-    document.querySelector(`.square1-${user.moves[1]}`).style.opacity = 1;
-
-    document.querySelector(`.square1-${user.moves[2]}`).style.transition = 'background-color 1s';
-    document.querySelector(`.square1-${user.moves[2]}`).style.backgroundColor = 'var(--color2)';
-    document.querySelector(`.cross-${user.moves[2]}`).style.color = 'var(--color3)';
-    document.querySelector(`.cross-${user.moves[2]}`).innerText = 'a';
-    document.querySelector(`.square1-${user.moves[2]}`).style.boxShadow = 'none';
-    document.querySelector(`.square1-${user.moves[2]}`).style.opacity = 1;
-
-    document.querySelector(`.square1-${user.moves[3]}`).style.transition = 'background-color 1s';
-    document.querySelector(`.square1-${user.moves[3]}`).style.backgroundColor = 'var(--color2)';
-    document.querySelector(`.cross-${user.moves[3]}`).style.color = 'var(--color3)';
-    document.querySelector(`.cross-${user.moves[3]}`).innerText = 'w';
-    document.querySelector(`.square1-${user.moves[3]}`).style.boxShadow = 'none';
-    document.querySelector(`.square1-${user.moves[3]}`).style.opacity = 1;
-
-    let timer1;
-    timer1 = setTimeout(() => {
+  timeoutId = setTimeout(() => {
+    if (user.moves.length === 4 && isCelabrating === 'no') {
+      isCelabrating = 'yes';
       document.querySelectorAll('.square1').forEach((element) => {
-        element.style.display = 'none';
+        element.style.opacity = 0;
+        element.style.border = 'none';
       })
+      document.querySelectorAll('.square2').forEach((element) => {
+        element.style.opacity = 0;
+        element.style.border = 'none';
+      })
+
+      user.moves.sort();
+
+      document.querySelector('.scoreboard').style.height = '0vh'
+      document.querySelector('.scoreboard').style.opacity = "0";
+
+      document.querySelector(`.square1-${user.moves[0]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square1-${user.moves[0]}`).style.backgroundColor = 'var(--color2)';
+      document.querySelector(`.cross-${user.moves[0]}`).style.color = 'var(--color3)';
+      document.querySelector(`.cross-${user.moves[0]}`).innerText = 'd';
+
+      document.querySelector(`.square1-${user.moves[0]}`).style.opacity = 1;
+
+      document.querySelector(`.square1-${user.moves[1]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square1-${user.moves[1]}`).style.backgroundColor = 'var(--color2)';
+      document.querySelector(`.cross-${user.moves[1]}`).style.color = 'var(--color3)';
+      document.querySelector(`.cross-${user.moves[1]}`).innerText = 'r';
+      document.querySelector(`.square1-${user.moves[1]}`).style.boxShadow = 'none';
+      document.querySelector(`.square1-${user.moves[1]}`).style.opacity = 1;
+
+      document.querySelector(`.square1-${user.moves[2]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square1-${user.moves[2]}`).style.backgroundColor = 'var(--color2)';
+      document.querySelector(`.cross-${user.moves[2]}`).style.color = 'var(--color3)';
+      document.querySelector(`.cross-${user.moves[2]}`).innerText = 'a';
+      document.querySelector(`.square1-${user.moves[2]}`).style.opacity = 1;
+
+      document.querySelector(`.square1-${user.moves[3]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square1-${user.moves[3]}`).style.backgroundColor = 'var(--color2)';
+      document.querySelector(`.cross-${user.moves[3]}`).style.color = 'var(--color3)';
+      document.querySelector(`.cross-${user.moves[3]}`).innerText = 'w';
+      document.querySelector(`.square1-${user.moves[3]}`).style.opacity = 1;
+
+      document.querySelectorAll('.circle').forEach((element) => {
+        element.style.color = 'var(--color1)';
+      })
+      let timer1;
+      timer1 = setTimeout(() => {
+        document.querySelectorAll('.square1').forEach((element) => {
+          element.style.display = 'none';
+        })
+        
+
+        document.querySelectorAll('.square2').forEach((element) => {
+          element.style.opacity = 1;
+          element.style.border = 'none';
+          document.querySelectorAll('.square2').forEach((element) => {
+            element.style.display = 'flex';
+          })
+        })
+      }, 1500)
+
+      let timer2;
+      timer2 = setTimeout(() => {
+        document.querySelectorAll('.circle').forEach((element) => {
+          element.style.opacity = 1;
+        })
+
+        document.querySelector(`.circle-${1}`).innerText = 't';
+        document.querySelector(`.circle-${2}`).innerText = 'r';
+        document.querySelector(`.circle-${3}`).innerText = 'y';
+        document.querySelector(`.circle-${4}`).innerText = '';
+        document.querySelector(`.circle-${5}`).innerText = 'a';
+        document.querySelector(`.circle-${6}`).innerText = 'g';
+        document.querySelector(`.circle-${7}`).innerText = 'a';
+        document.querySelector(`.circle-${8}`).innerText = 'i';
+        document.querySelector(`.circle-${9}`).innerText = 'n';
+
+        for (let i = 1; i < 10; i++) {
+          let newTimer;
+          newTimer = setTimeout(() => {
+            document.querySelector(`.square2-${i}`).style.backgroundColor = 'var(--color1)';
+            document.querySelector(`.square2-${i}`).style.boxShadow = 'none';
+            document.querySelector(`.square2-${i}`).style.border = 'none';
+            document.querySelector(`.square2-${i}`).style.opacity = 1;
+            document.querySelector(`.circle-${i}`).style.opacity = 1
+            document.querySelector(`.circle-${i}`).style.color = 'var(--color2)'
+
+            let newTimer2;
+            newTimer2 = setTimeout(() => {
+              document.querySelector('.container').style.opacity = 0;
+
+
+            }, 1000)
+          })
+        }
+      }, 1500)
+      let newTimer3;
+      newTimer3 = setTimeout(() => {
+        location.reload();
+      }, 3500)
+
+    } else if (user.moves.length === 5 && isCelabrating === 'no') {
+      isCelabrating = 'yes';
+
+      console.log('second celebration');
+      document.querySelectorAll('.square1').forEach((element) => {
+        element.style.opacity = 0;
+        element.style.border = 'none';
+      })
+      document.querySelectorAll('.square2').forEach((element) => {
+        element.style.opacity = 0;
+        element.style.border = 'none'
+      })
+
+      computer.moves.sort();
+
+      document.querySelector('.scoreboard').style.height = '0vh'
+      document.querySelector('.scoreboard').style.opacity = "0";
+
+      document.querySelector(`.square2-${computer.moves[0]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square2-${computer.moves[0]}`).style.backgroundColor = 'var(--color1)';
+      document.querySelector(`.circle-${computer.moves[0]}`).style.color = 'var(--color3)';
+      document.querySelector(`.circle-${computer.moves[0]}`).innerText = 'd';
+      document.querySelector(`.square2-${computer.moves[0]}`).style.opacity = 1;
+
+      document.querySelector(`.square2-${computer.moves[1]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square2-${computer.moves[1]}`).style.backgroundColor = 'var(--color1)';
+      document.querySelector(`.circle-${computer.moves[1]}`).style.color = 'var(--color3)';
+      document.querySelector(`.circle-${computer.moves[1]}`).innerText = 'r';
+      document.querySelector(`.square2-${computer.moves[1]}`).style.opacity = 1;
+
+      document.querySelector(`.square2-${computer.moves[2]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square2-${computer.moves[2]}`).style.backgroundColor = 'var(--color1)';
+      document.querySelector(`.circle-${computer.moves[2]}`).style.color = 'var(--color3)';
+      document.querySelector(`.circle-${computer.moves[2]}`).innerText = 'a';
+      document.querySelector(`.square2-${computer.moves[2]}`).style.opacity = 1;
+
+      document.querySelector(`.square2-${computer.moves[3]}`).style.transition = 'background-color 1s';
+      document.querySelector(`.square2-${computer.moves[3]}`).style.backgroundColor = 'var(--color1)';
+      document.querySelector(`.circle-${computer.moves[3]}`).style.color = 'var(--color3)';
+      document.querySelector(`.circle-${computer.moves[3]}`).innerText = 'w';
+      document.querySelector(`.square2-${computer.moves[3]}`).style.opacity = 1;
 
       document.querySelectorAll('.square2').forEach((element) => {
-        element.style.opacity = 1;
-        document.querySelectorAll('.square2').forEach((element) => {
-          element.style.display = 'flex';
-        })
+        element.style.transition = '1s';
       })
-    }, 1500)
-
-    let timer2;
-    timer2 = setTimeout(() => {
       document.querySelectorAll('.circle').forEach((element) => {
-        element.style.opacity = 1;
-        element.style.color = 'var(--color3)'
+        element.style.transition = '1s';
       })
 
-      document.querySelector(`.circle-${1}`).innerText = 't';
-      document.querySelector(`.circle-${2}`).innerText = 'r';
-      document.querySelector(`.circle-${3}`).innerText = 'y';
-      document.querySelector(`.circle-${4}`).innerText = '';
-      document.querySelector(`.circle-${5}`).innerText = 'a';
-      document.querySelector(`.circle-${6}`).innerText = 'g';
-      document.querySelector(`.circle-${7}`).innerText = 'a';
-      document.querySelector(`.circle-${8}`).innerText = 'i';
-      document.querySelector(`.circle-${9}`).innerText = 'n';
-
-      for (let i = 1; i < 10; i++) {
-        let newTimer;
-        newTimer = setTimeout(() => {
-          document.querySelector(`.square2-${i}`).style.backgroundColor = 'var(--color1)';
-          document.querySelector(`.square2-${i}`).style.boxShadow = 'none';
-          document.querySelector(`.square2-${i}`).style.border = 'none';
-          document.querySelector(`.square2-${i}`).style.opacity = 1;
-          document.querySelector(`.circle-${i}`).style.opacity = 1
-          document.querySelector(`.circle-${i}`).style.color = 'var(--color2)'
-
-          let newTimer2;
-          newTimer2 = setTimeout(() => {
-            document.querySelector('.container').style.opacity = 0;
-
-
-          }, 1000)
+      let timer1;
+      timer1 = setTimeout(() => {
+        document.querySelectorAll('.square1').forEach((element) => {
+          element.style.display = 'none';
         })
-      }
-    }, 1500)
-    let newTimer3;
-    newTimer3 = setTimeout(() => {
-      location.reload();
-    }, 3500)
 
-  }
+        document.querySelectorAll('.square2').forEach((element) => {
+          element.style.opacity = 1;
+          element.style.backgroundColor = 'var(--color1';
+          document.querySelectorAll('.square2').forEach((element) => {
+            element.style.display = 'flex';
+          })
+        })
+      }, 1500)
+
+      let timer2;
+      timer2 = setTimeout(() => {
+        document.querySelectorAll('.circle').forEach((element) => {
+          element.style.opacity = 1;
+          element.style.color = 'var(--color3)'
+        })
+
+        document.querySelector(`.circle-${1}`).innerText = 't';
+        document.querySelector(`.circle-${2}`).innerText = 'r';
+        document.querySelector(`.circle-${3}`).innerText = 'y';
+        document.querySelector(`.circle-${4}`).innerText = '';
+        document.querySelector(`.circle-${5}`).innerText = 'a';
+        document.querySelector(`.circle-${6}`).innerText = 'g';
+        document.querySelector(`.circle-${7}`).innerText = 'a';
+        document.querySelector(`.circle-${8}`).innerText = 'i';
+        document.querySelector(`.circle-${9}`).innerText = 'n';
+
+        for (let i = 1; i < 10; i++) {
+          let newTimer;
+          newTimer = setTimeout(() => {
+            document.querySelector(`.square2-${i}`).style.backgroundColor = 'var(--color1)';
+            document.querySelector(`.square2-${i}`).style.boxShadow = 'none';
+            document.querySelector(`.square2-${i}`).style.opacity = 1;
+            document.querySelector(`.circle-${i}`).style.opacity = 1
+            document.querySelector(`.circle-${i}`).style.color = 'var(--color2)'
+
+            let newTimer2;
+            newTimer2 = setTimeout(() => {
+              document.querySelector('.container').style.opacity = 0;
+
+
+            }, 1000)
+          })
+        }
+      }, 1500)
+      let newTimer3;
+      newTimer3 = setTimeout(() => {
+        location.reload();
+      }, 3500)
+
+    }
+  }, 10)
 }
 
 function flipHeads() {
@@ -896,7 +1037,7 @@ function startTheFilp() {
     document.querySelector('.paragraph').style.opacity = 1;
     document.getElementById('main-div').style.opacity = 1;
     document.querySelector('.btns-container').style.opacity = 1;
-  }, 400)
+  }, 1000)
 }
 
 function generateP2(result) {
@@ -930,16 +1071,16 @@ function userScoreUpdate() {
 
   userWins++;
   localStorage.setItem('userwins', JSON.stringify(userWins));
-  document.querySelector('.userScoreText').classList.add('refresh-score')
-  document.querySelector('.userScoreText').innerText = `${userWins}`
+  document.querySelector('.user-score-text').classList.add('refresh-score')
+  document.querySelector('.user-score-text').innerText = `${userWins}`
 
 }
 
 function computerScoreUpdate() {
   computerWins++;
   localStorage.setItem('computerwins', JSON.stringify(computerWins));
-  document.querySelector('.machineScoreText').classList.add('refresh-score')
-  document.querySelector('.machineScoreText').innerText = `${computerWins}`
+  document.querySelector('.machine-score-text').classList.add('refresh-score')
+  document.querySelector('.machine-score-text').innerText = `${computerWins}`
 
 }
 
@@ -949,12 +1090,14 @@ if (localStorage.getItem('hasgamestarted') === 'yes') {
     if (e.target !== document.querySelector('.username')
       && e.target !== document.querySelector('.machinename')
       && e.target !== document.querySelector('.edit-username-input')
-      && e.target !== document.querySelector('.edit-machinename-input')) {
+      && e.target !== document.querySelector('.edit-machinename-input')
+      && e.target !== document.querySelector('.user-score-text')
+      && e.target !== document.querySelector('.machine-score-text')) {
       generatePalette();
     }
   }, { capture: true })
 
-  document.querySelector('.username').addEventListener('dblclick', () => {
+  document.querySelector('.username').addEventListener('click', () => {
     document.querySelector('.username').style.display = 'none';
     document.querySelector('.edit-username-input').style.display = 'initial';
     document.querySelector('.edit-username-input').focus();
@@ -974,7 +1117,7 @@ if (localStorage.getItem('hasgamestarted') === 'yes') {
     })
   })
 
-  document.querySelector('.machinename').addEventListener('dblclick', () => {
+  document.querySelector('.machinename').addEventListener('click', () => {
     document.querySelector('.machinename').style.display = 'none';
     document.querySelector('.edit-machinename-input').style.display = 'initial';
     document.querySelector('.edit-machinename-input').focus();
@@ -993,8 +1136,98 @@ if (localStorage.getItem('hasgamestarted') === 'yes') {
     })
   });
 
-  
+  document.querySelector('.user-score-text').addEventListener('click', () => {
+    generateAlertForScoreReset();
+  })
+
+  document.querySelector('.machine-score-text').addEventListener('click', () => {
+    generateAlertForScoreReset();
+  })
 
 }
 
+function resetTheScore() {
+  userWins = 0;
+  computerWins = 0;
+  document.querySelector('.machine-score-text').innerText = `${computerWins}`;
+  document.querySelector('.user-score-text').innerText = `${userWins}`;
+  closeResetDialog();
+}
 
+function generateAlertForScoreReset() {
+  const dialog = document.createElement('dialog');
+  dialog.setAttribute('open', 'yes')
+  dialog.setAttribute('class', 'dialog-reset')
+  const paragraph = document.createElement('p');
+  paragraph.setAttribute('class', 'reset-paragraph')
+  paragraph.innerText = 'Fancy a new beginning?'
+  dialog.appendChild(paragraph);
+  const btnsDiv = document.createElement('div');
+  btnsDiv.setAttribute('class', 'reset-btns-container');
+  const no = document.createElement('button');
+  no.setAttribute('class', 'reset-no-button');
+  no.setAttribute('onclick', 'resetTheScore()');
+  no.innerText = 'Reset  the score';
+  btnsDiv.appendChild(no);
+  const yes = document.createElement('button');
+  yes.setAttribute('class', 'reset-yes-button');
+  yes.setAttribute('onclick', 'restartTheGame()');
+  yes.innerText = 'Restart the game';
+  btnsDiv.appendChild(yes);
+  dialog.appendChild(btnsDiv);
+  document.querySelector('.container').style.opacity = 0;
+  const closeTag = document.createElement('div');
+  closeTag.setAttribute('class', 'close-tag');
+  const closeTagX = document.createElement('p');
+  closeTagX.setAttribute('class', 'close-tag-x');
+  closeTagX.setAttribute('onclick', 'closeResetDialog()')
+  closeTagX.innerText = 'x';
+  closeTag.appendChild(closeTagX);
+  dialog.appendChild(closeTag);
+  document.body.append(dialog);
+  setTimeout(() => {
+    document.querySelector('.dialog-reset').style.height = '25vh';
+    setTimeout(() => {
+      document.querySelector('.reset-paragraph').style.opacity = 1;
+      document.querySelector('.reset-no-button').style.opacity = 1;
+      document.querySelector('.reset-yes-button').style.opacity = 1;
+    }, 180)
+  }, 10)
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeResetDialog();
+    }
+  }, { once: true })
+}
+
+
+function closeResetDialog() {
+  document.querySelector('.reset-paragraph').style.opacity = 0;
+  document.querySelector('.reset-no-button').style.opacity = 0;
+  document.querySelector('.reset-yes-button').style.opacity = 0;
+  setTimeout(() => {
+    document.querySelector('.dialog-reset').style.height = '0vh';
+    document.querySelector('.container').style.opacity = 1;
+  }, 400)
+  setTimeout(() => {
+    document.querySelector('.dialog-reset').remove()
+  }, 1500)
+}
+
+function restartTheGame() {
+  document.querySelector('.reset-paragraph').style.opacity = 0;
+  document.querySelector('.reset-no-button').style.opacity = 0;
+  document.querySelector('.reset-yes-button').style.opacity = 0;
+  setTimeout(() => {
+    document.querySelector('.dialog-reset').style.height = '0vh';
+    document.querySelector('.scoreboard').style.height = '0vh';
+  }, 400)
+  setTimeout(() => {
+    document.querySelector('.dialog-reset').remove()
+    localStorage.clear();
+    location.reload();
+  }, 1500)
+}
+
+console.log(document.querySelector('.close-tag-x'))
