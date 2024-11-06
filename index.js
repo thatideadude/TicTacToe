@@ -69,7 +69,6 @@ function generateBoard() {
       const circle = document.createElement('p');
       circle.innerText = 'o';
       circle.setAttribute('class', `circle-${i} circle`);
-      // circle.style.display = 'none';
       square2.appendChild(circle);
       row.appendChild(square1);
       row.appendChild(square2);
@@ -87,7 +86,7 @@ function generateBoard() {
     setTimeout(() => {
       hasGameStarted = 'yes';
       localStorage.setItem('hasGameStarted', hasGameStarted)
-    }, 1200)
+    }, 400)
 
   } if (localStorage.getItem('turntoplay') === 'computer') {
     computer.generateMove();
@@ -430,118 +429,120 @@ const computer = {
             computer.play(board[randomMove]);
           }
         }
-        else {computer.play(3);}
+        else { computer.play(3); }
 
         if (checkForVictory(computer) !== "victory") {
           checkForDraw();
         }
       }, 150)
     }
-    checkForDraw()
-    checkForVictory(computer);
-  },
+    setTimeout(() => {
+      checkForDraw()
+      checkForVictory(computer);
+    }, 100)
+    },
 
-  celebrate: () => {
-    if (isCelabrating === 'no') {
-      isCelabrating = 'yes';
-      turnToPlay = 'computer';
-      localStorage.setItem('turntoplay', turnToPlay)
-      document.querySelectorAll('.square1').forEach((element) => {
-        element.style.opacity = 0;
-      })
-      document.querySelectorAll('.square2').forEach((element) => {
-        element.style.opacity = 0;
-      })
-
-      document.querySelector(`.square2-${computer.result[0]}`).style.transition = 'background-color 1s';
-      document.querySelector(`.square2-${computer.result[0]}`).style.backgroundColor = 'var(--color2)';
-      document.querySelector(`.circle-${computer.result[0]}`).style.color = 'var(--color3)';
-      document.querySelector(`.circle-${computer.result[0]}`).innerText = 's';
-      document.querySelector(`.square2-${computer.result[0]}`).style.boxShadow = 'none';
-      document.querySelector(`.square2-${computer.result[0]}`).style.opacity = 1;
-
-      document.querySelector(`.square2-${computer.result[1]}`).style.transition = 'background-color 1s';
-      document.querySelector(`.square2-${computer.result[1]}`).style.backgroundColor = 'var(--color2)';
-      document.querySelector(`.circle-${computer.result[1]}`).style.color = 'var(--color3)';
-      document.querySelector(`.circle-${computer.result[1]}`).innerText = 'o';
-      document.querySelector(`.square2-${computer.result[1]}`).style.boxShadow = 'none';
-      document.querySelector(`.square2-${computer.result[1]}`).style.opacity = 1;
-
-      document.querySelector(`.square2-${computer.result[2]}`).style.transition = 'background-color 1s';
-      document.querySelector(`.square2-${computer.result[2]}`).style.backgroundColor = 'var(--color2)';
-      document.querySelector(`.circle-${computer.result[2]}`).style.color = 'var(--color3)';
-      document.querySelector(`.circle-${computer.result[2]}`).innerText = 'z';
-      document.querySelector(`.square2-${computer.result[2]}`).style.boxShadow = 'none';
-      document.querySelector(`.square2-${computer.result[2]}`).style.opacity = 1;
-      document.querySelectorAll('.square1').forEach((element) => {
-        element.style.transition = '1s';
-      })
-      computerScoreUpdate();
-      let timer1;
-      timer1 = setTimeout(() => {
-        document.querySelectorAll('.square1').forEach((element) => {
-          element.style.display = 'none';
-        })
-
-        document.querySelectorAll('.square2').forEach((element) => {
-          element.style.opacity = 0;
+      celebrate: () => {
+        if (isCelabrating === 'no') {
+          isCelabrating = 'yes';
+          turnToPlay = 'computer';
+          localStorage.setItem('turntoplay', turnToPlay)
+          document.querySelectorAll('.square1').forEach((element) => {
+            element.style.opacity = 0;
+          })
           document.querySelectorAll('.square2').forEach((element) => {
-            element.style.display = 'flex';
+            element.style.opacity = 0;
           })
-        })
-      }, 1000)
 
-      let timer2;
-      timer2 = setTimeout(() => {
-        document.querySelectorAll('.circle').forEach((element) => {
-          element.style.opacity = 0;
-          element.style.color = 'var(--color3)'
-        })
+          document.querySelector(`.square2-${computer.result[0]}`).style.transition = 'background-color 1s';
+          document.querySelector(`.square2-${computer.result[0]}`).style.backgroundColor = 'var(--color2)';
+          document.querySelector(`.circle-${computer.result[0]}`).style.color = 'var(--color3)';
+          document.querySelector(`.circle-${computer.result[0]}`).innerText = 's';
+          document.querySelector(`.square2-${computer.result[0]}`).style.boxShadow = 'none';
+          document.querySelector(`.square2-${computer.result[0]}`).style.opacity = 1;
 
-        document.querySelector(`.circle-${1}`).innerText = 't';
-        document.querySelector(`.circle-${2}`).innerText = 'r';
-        document.querySelector(`.circle-${3}`).innerText = 'y';
-        document.querySelector(`.circle-${4}`).innerText = '';
-        document.querySelector(`.circle-${5}`).innerText = 'a';
-        document.querySelector(`.circle-${6}`).innerText = 'g';
-        document.querySelector(`.circle-${7}`).innerText = 'a';
-        document.querySelector(`.circle-${8}`).innerText = 'i';
-        document.querySelector(`.circle-${9}`).innerText = 'n';
+          document.querySelector(`.square2-${computer.result[1]}`).style.transition = 'background-color 1s';
+          document.querySelector(`.square2-${computer.result[1]}`).style.backgroundColor = 'var(--color2)';
+          document.querySelector(`.circle-${computer.result[1]}`).style.color = 'var(--color3)';
+          document.querySelector(`.circle-${computer.result[1]}`).innerText = 'o';
+          document.querySelector(`.square2-${computer.result[1]}`).style.boxShadow = 'none';
+          document.querySelector(`.square2-${computer.result[1]}`).style.opacity = 1;
 
-        document.querySelector('.scoreboard').style.opacity = 0;
-        for (let i = 1; i < 10; i++) {
-          let newTimer;
-          newTimer = setTimeout(() => {
-            document.querySelector(`.square2-${i}`).style.backgroundColor = 'var(--color1)';
-            document.querySelector(`.square2-${i}`).style.boxShadow = 'none';
-            document.querySelector(`.square2-${i}`).style.border = 'none';
-            document.querySelector(`.square2-${i}`).style.opacity = 1;
-            document.querySelector(`.circle-${i}`).style.opacity = 1
-            document.querySelector(`.circle-${i}`).style.color = 'var(--color2)'
-
-            let newTimer2;
-            newTimer2 = setTimeout(() => {
-              document.querySelector('.container').style.opacity = 0;
-
-
-            }, 1000)
+          document.querySelector(`.square2-${computer.result[2]}`).style.transition = 'background-color 1s';
+          document.querySelector(`.square2-${computer.result[2]}`).style.backgroundColor = 'var(--color2)';
+          document.querySelector(`.circle-${computer.result[2]}`).style.color = 'var(--color3)';
+          document.querySelector(`.circle-${computer.result[2]}`).innerText = 'z';
+          document.querySelector(`.square2-${computer.result[2]}`).style.boxShadow = 'none';
+          document.querySelector(`.square2-${computer.result[2]}`).style.opacity = 1;
+          document.querySelectorAll('.square1').forEach((element) => {
+            element.style.transition = '1s';
           })
+          computerScoreUpdate();
+          let timer1;
+          timer1 = setTimeout(() => {
+            document.querySelectorAll('.square1').forEach((element) => {
+              element.style.display = 'none';
+            })
+
+            document.querySelectorAll('.square2').forEach((element) => {
+              element.style.opacity = 0;
+              document.querySelectorAll('.square2').forEach((element) => {
+                element.style.display = 'flex';
+              })
+            })
+          }, 1000)
+
+          let timer2;
+          timer2 = setTimeout(() => {
+            document.querySelectorAll('.circle').forEach((element) => {
+              element.style.opacity = 0;
+              element.style.color = 'var(--color3)'
+            })
+
+            document.querySelector(`.circle-${1}`).innerText = 't';
+            document.querySelector(`.circle-${2}`).innerText = 'r';
+            document.querySelector(`.circle-${3}`).innerText = 'y';
+            document.querySelector(`.circle-${4}`).innerText = '';
+            document.querySelector(`.circle-${5}`).innerText = 'a';
+            document.querySelector(`.circle-${6}`).innerText = 'g';
+            document.querySelector(`.circle-${7}`).innerText = 'a';
+            document.querySelector(`.circle-${8}`).innerText = 'i';
+            document.querySelector(`.circle-${9}`).innerText = 'n';
+
+            document.querySelector('.scoreboard').style.opacity = 0;
+            for (let i = 1; i < 10; i++) {
+              let newTimer;
+              newTimer = setTimeout(() => {
+                document.querySelector(`.square2-${i}`).style.backgroundColor = 'var(--color1)';
+                document.querySelector(`.square2-${i}`).style.boxShadow = 'none';
+                document.querySelector(`.square2-${i}`).style.border = 'none';
+                document.querySelector(`.square2-${i}`).style.opacity = 1;
+                document.querySelector(`.circle-${i}`).style.opacity = 1
+                document.querySelector(`.circle-${i}`).style.color = 'var(--color2)'
+
+                let newTimer2;
+                newTimer2 = setTimeout(() => {
+                  document.querySelector('.container').style.opacity = 0;
+
+
+                }, 1000)
+              })
+            }
+          }, 1200)
+          let newTimer3;
+          newTimer3 = setTimeout(() => {
+            location.reload();
+          }, 2500)
+
         }
-      }, 1200)
-      let newTimer3;
-      newTimer3 = setTimeout(() => {
-        location.reload();
-      }, 2500)
-
-    }
-  }
+      }
 };
-let isCelabrating = "no";
+  let isCelabrating = "no";
 
-if (localStorage.getItem('userwins') === null) {
-  userWins = 0
-} else {
-  userWins = JSON.parse(localStorage.getItem('userwins'));
+  if(localStorage.getItem('userwins') === null) {
+    userWins = 0
+  } else {
+    userWins = JSON.parse(localStorage.getItem('userwins'));
 };
 
 if (localStorage.getItem('computerwins') === null) {
@@ -813,7 +814,7 @@ function endInDraw() {
         document.querySelectorAll('.square1').forEach((element) => {
           element.style.display = 'none';
         })
-        
+
 
         document.querySelectorAll('.square2').forEach((element) => {
           element.style.opacity = 1;
@@ -1211,10 +1212,11 @@ function closeResetDialog() {
 }
 
 function restartTheGame() {
+  document.querySelector('.close-tag').style.opacity = 0;
   document.querySelector('.reset-paragraph').style.opacity = 0;
   document.querySelector('.reset-no-button').style.opacity = 0;
   document.querySelector('.reset-yes-button').style.opacity = 0;
-  
+
   setTimeout(() => {
     document.querySelector('.dialog-reset').style.height = '0vh';
     document.querySelector('.scoreboard').style.height = '0vh';
