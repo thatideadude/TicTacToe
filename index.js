@@ -20,7 +20,7 @@ if (localStorage.getItem('hasgamestarted' === null)) {
   hasGameStarted = 'no';
 } else {
   setTimeout(() => {  hasGameStarted = 'yes';
-    localStorage.setItem('hasgamestarted', hasGameStarted)}, 10000)
+    localStorage.setItem('hasgamestarted', hasGameStarted)}, 3000)
 }
 
 function generateBoard() {
@@ -943,10 +943,7 @@ function computerScoreUpdate() {
 
 }
 
-
-
-
-if (hasGameStarted === 'yes') {
+if (localStorage.getItem('hasgamestarted') === 'yes') {
 
   document.querySelector('.scoreboard').addEventListener('click', (e) => {
     if (e.target !== document.querySelector('.username')
@@ -990,14 +987,13 @@ if (hasGameStarted === 'yes') {
         document.querySelector('.machinename').style.display = 'initial';
       }
       if (e.key === 'Escape') {
-        document.querySelector('.edit-machinename-input').value = machineName;
         document.querySelector('.edit-machinename-input').style.display = 'none';
         document.querySelector('.machinename').style.display = 'initial';
       }
     })
   });
 
-
+  
 
 }
 
